@@ -45,3 +45,8 @@ docs/
 
 # translation temp files
 po/*~
+
+# ignore renv for now
+renv/
+renv.lock
+.Rprofile
