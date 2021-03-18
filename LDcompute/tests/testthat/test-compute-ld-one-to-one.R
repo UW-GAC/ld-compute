@@ -107,6 +107,26 @@ test_that("different methods", {
 
 })
 
+test_that("multiple methods are allowed", {
+  # Use a different method to calculate LD.
+  gds <- local_gds()
+  var1 <- 1
+  var2 <- 2
+
+  ld_composite <- compute_ld(gds, var1, var2, methods = "composite")
+  ld_dprime <- compute_ld(gds, var1, var2, methods = "dprime")
+  ld_corr <- compute_ld(gds, var1, var2, method = "corr")
+  ld_r <- compute_ld(gds, var1, var2, method = "r")
+
+  ld_full <- compute_ld(gds, var1, var2, methods = c("composite", "dprime", "corr", "r"))
+  expect_equal(names(ld_full), c("variant.id.1", "variant.id.2", "ld_composite", "ld_dprime", "ld_corr", "ld_r"))
+  expect_equal(ld_full$variant.id.1, var1)
+  expect_equal(ld_full$variant.id.2, var2)
+
+  # Method not allowed.
+  #expect_error(compute_ld(gds, var1, var2, method = "r"), "allowed methods")
+})
+
 test_that("different chromosomes", {
   fail("what do we want to happen?")
 })
