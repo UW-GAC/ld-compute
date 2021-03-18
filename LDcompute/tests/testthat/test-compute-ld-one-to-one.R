@@ -12,7 +12,7 @@ test_that("works normally", {
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)
-  expect_equal(unname(ld$ld_composite), chk$LD[1,2])
+  expect_equal(ld$ld_composite, chk$LD[1,2])
 })
 
 test_that("returns ids in the correct order", {
@@ -29,7 +29,7 @@ test_that("returns ids in the correct order", {
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)
-  expect_equal(unname(ld$ld_composite), chk$LD[1,2])
+  expect_equal(ld$ld_composite, chk$LD[1,2])
 })
 
 test_that("missing data", {
@@ -76,7 +76,7 @@ test_that("different methods", {
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "composite", slide = -1, verbose = FALSE)
-  expect_equal(unname(ld$ld_composite), chk$LD[1,2])
+  expect_equal(ld$ld_composite, chk$LD[1,2])
 
   ld <- compute_ld(gds, var1, var2, methods = "dprime")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_dprime"))
@@ -84,7 +84,7 @@ test_that("different methods", {
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "dprime", slide = -1, verbose = FALSE)
-  expect_equal(unname(ld$ld_dprime), chk$LD[1,2])
+  expect_equal(ld$ld_dprime, chk$LD[1,2])
 
   ld <- compute_ld(gds, var1, var2, method = "corr")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_corr"))
@@ -92,7 +92,7 @@ test_that("different methods", {
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "corr", slide = -1, verbose = FALSE)
-  expect_equal(unname(ld$ld_corr), chk$LD[1,2])
+  expect_equal(ld$ld_corr, chk$LD[1,2])
 
   ld <- compute_ld(gds, var1, var2, method = "r")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r"))
@@ -100,7 +100,7 @@ test_that("different methods", {
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "r", slide = -1, verbose = FALSE)
-  expect_equal(unname(ld$ld_r), chk$LD[1,2])
+  expect_equal(ld$ld_r, chk$LD[1,2])
 
   # Method not allowed.
   expect_error(compute_ld(gds, var1, var2, method = "foo"), "allowed methods")
