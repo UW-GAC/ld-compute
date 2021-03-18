@@ -32,9 +32,37 @@ test_that("returns ids in the correct order", {
   expect_equal(unname(ld$ld_composite), chk$LD[1,2])
 })
 
-test_that("missing data", {})
+test_that("missing data", {
+  gds <- local_gds()
+  missing_rate <- SeqVarTools::missingGenotypeRate(gds, "by.variant")
+  var1 <- which(missing_rate > 0)[1]
+  var2 <- 1
 
-test_that("multiallelic variants", {})
+  ld <- compute_ld(gds, var1, var2)
+
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(nrow(ld), 1)
+  expect_equal(ld$variant.id.1, var1)
+  expect_equal(ld$variant.id.2, var2)
+  expect_true(is.numeric(ld$ld_composite))
+  expect_true(!is.na(ld$ld_composite))
+})
+
+test_that("multiallelic variants", {
+  gds <- local_gds()
+  missing_rate <- SeqVarTools::missingGenotypeRate(gds, "by.variant")
+  var1 <- which(nAlleles(gds) > 2)[1]
+  var2 <- which(nAlleles(gds) == 2)[1]
+
+  ld <- compute_ld(gds, var1, var2)
+
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(nrow(ld), 1)
+  expect_equal(ld$variant.id.1, var1)
+  expect_equal(ld$variant.id.2, var2)
+  expect_true(is.numeric(ld$ld_composite))
+  expect_true(!is.na(ld$ld_composite))
+})
 
 test_that("multiple methods", {})
 
