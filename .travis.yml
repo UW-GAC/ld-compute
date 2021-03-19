@@ -5,6 +5,6 @@ r: bioc-release
 
 cache: packages
 install:
-  - Rscript -e 'install.packages(c("devtools","roxygen2","testthat"));devtools::install_deps("LDcompute")'
+  - Rscript -e 'install.packages(c("devtools","roxygen2","testthat"));devtools::install_deps("LDcompute"); BiocManager::install("SeqVarTools")'
 script:
   - Rscript -e 'devtools::check("LDcompute")'
