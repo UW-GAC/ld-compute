@@ -1,8 +1,12 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
+language: r
+r: bioc-release
+
 cache: packages
 install:
-  - Rscript -e 'install.packages(c("devtools","roxygen2","testthat"));devtools::install_deps("LDcompute")'
+  - Rscript -e 'install.packages(c("devtools","roxygen2","testthat", "BiocManager")); BiocManager::install("SeqVarTools"); devtools::install_deps("LDcompute")'
 script:
   - Rscript -e 'devtools::check("LDcompute")'
+after_success:
+  - Rscript -e 'covr::codecov("LDcompute")'
