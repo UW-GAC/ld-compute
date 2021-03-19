@@ -133,3 +133,26 @@ test_that("multiple methods are allowed", {
 test_that("different chromosomes", {
   skip("what do we want to happen?")
 })
+
+test_that("sample set", {
+  gds <- local_gds()
+  sample_ids <- seqGetData(gds, "sample.id")
+  sample_include <- sample_ids[1:500]
+  var1 <- 1
+  var2 <- 2
+  ld_all <- compute_ld(gds, var1, var2)
+  ld_sub <- compute_ld(gds, var1, var2, sample_include = sample_include)
+
+  expect_equal(names(ld_sub), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(nrow(ld_sub), 1)
+  expect_equal(ld_sub$variant.id.1, var1)
+  expect_equal(ld_sub$variant.id.2, var2)
+  expect_true(is.numeric(ld_sub$ld_composite))
+
+  # Different than with all samples together.
+  expect_true(ld_sub$ld_composite != ld_all$ld_composite)
+
+  # Check against the function directly.
+  chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), sample.id=sample_include, slide = -1, verbose = FALSE)
+  expect_equal(ld_sub$ld_composite, chk$LD[1,2])
+})

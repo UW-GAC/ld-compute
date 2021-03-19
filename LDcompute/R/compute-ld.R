@@ -25,7 +25,13 @@
 #' @importFrom tibble tibble %>%
 
 
-compute_ld <- function(gds, variant_include_1, variant_include_2 = NULL, methods = c("composite")) {
+compute_ld <- function(
+  gds,
+  variant_include_1,
+  variant_include_2 = NULL,
+  methods = c("composite"),
+  sample_include = NULL
+) {
 
   # Checks - to be written.
 
@@ -39,11 +45,16 @@ compute_ld <- function(gds, variant_include_1, variant_include_2 = NULL, methods
   }
 
   # Choose which method to call - to be written.
-
   res_list <- list()
   for (method in methods) {
   # Compute LD for a pair of variants.
-    res_list[[method]] <- .compute_ld_one_to_one(gds, variant_include_1, variant_include_2, method = method)
+    res_list[[method]] <- .compute_ld_one_to_one(
+      gds,
+      variant_include_1,
+      variant_include_2,
+      method,
+      sample_include = sample_include
+    )
   }
 
   # Add other methods to the data frame as columns.
@@ -59,12 +70,13 @@ compute_ld <- function(gds, variant_include_1, variant_include_2 = NULL, methods
 }
 
 # Computes LD between a pair of variants.
-.compute_ld_one_to_one <- function(gds, variant_include_1, variant_include_2, method) {
+.compute_ld_one_to_one <- function(gds, variant_include_1, variant_include_2, method, sample_include = NULL) {
 
   # For variant.ids with multiple alternate alleles, I think that snpgdsLDMat
   # just uses the ref dosage to calculate LD.
   ld <- snpgdsLDMat(gds, snp.id = c(variant_include_1, variant_include_2),
-                    method = method, slide = -1, verbose = FALSE)
+                    sample.id = sample_include, method = method, slide = -1,
+                    verbose = FALSE)
 
   dat <- tibble(
     variant.id.1 = variant_include_1,
