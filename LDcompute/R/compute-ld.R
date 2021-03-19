@@ -46,35 +46,38 @@ compute_ld <- function(
     stop(msg)
   }
 
+  variant_include <- c(variant_include_1, variant_include_2)
+
   res_list <- list()
-  # Figure out which subfunction to call.
-  if (length(variant_include_1) == 1 & length(variant_include_2) == 1) {
-    for (method in methods) {
-    # Compute LD for a pair of variants.
-      res_list[[method]] <- .compute_ld_one_to_one(
-        gds,
-        variant_include_1,
-        variant_include_2,
-        method,
-        sample_include = sample_include
-      )
+  for (method in methods) {
+    # Calculate ld between all pairs of variants provided.
+    ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
+    tmp <- ld$LD
+    colnames(tmp) <- rownames(tmp) <- ld$snp.id
+
+    dat <- tibble::as_tibble(tmp, rownames="variant.id.1") %>%
+      pivot_longer(-variant.id.1, names_to = "variant.id.2", values_to = "ld") %>%
+      mutate(variant.id.1 = as.integer(variant.id.1), variant.id.2 = as.integer(variant.id.2))
+
+    # Now filter specific to inputs.
+    if (length(variant_include_1 == 1) & length(variant_include_2) == 1) {
+      # LD between a pair of variants.
+      dat <- dat %>%
+        filter(variant.id.1 == variant_include_1, variant.id.2 == variant_include_2)
+    } else if (length(variant_include_1 > 1) & length(variant_include_2) == 0) {
+      # LD between all pairs of variants.
+      dat <- dat %>%
+          filter(variant.id.1 < variant.id.2)
+
     }
-  } else if (length(variant_include_1) > 1 & length(variant_include_2) == 0) {
-    for (method in methods) {
-      # Compute LD for a pair of variants.
-        res_list[[method]] <- .compute_ld_many_to_many(
-          gds,
-          variant_include_1,
-          method,
-          sample_include = sample_include
-        )
-      }
+
+    names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
+    res_list[[method]] <- dat
   }
 
-  # Choose which method to call - to be written.
-
-  # Add other methods to the data frame as columns.
-  # This is probably slow.
+  # This will be slow.
+  # We can probably speed it up by just adding columns to the final data frame.
+  # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
   res <- res_list[[1]]
   if (length(methods) > 1) {
     for (i in 2:length(methods)) {
@@ -83,42 +86,4 @@ compute_ld <- function(
     }
   }
   res
-}
-
-# Computes LD between a pair of variants.
-.compute_ld_one_to_one <- function(gds, variant_include_1, variant_include_2, method, sample_include = NULL) {
-
-  # For variant.ids with multiple alternate alleles, I think that snpgdsLDMat
-  # just uses the ref dosage to calculate LD.
-  ld <- snpgdsLDMat(gds, snp.id = c(variant_include_1, variant_include_2),
-                    sample.id = sample_include, method = method, slide = -1,
-                    verbose = FALSE)
-
-  dat <- tibble(
-    variant.id.1 = variant_include_1,
-    variant.id.2 = variant_include_2,
-    ld = ld$LD[1,2]
-  )
-  names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
-  dat
-}
-
-# Computes LD between one variant and a set of other variants.
-.compute_ld_one_to_many <- function() {}
-
-# Computes LD between all pairs of a set of variants.
-.compute_ld_many_to_many <- function(gds, variant_include, method, sample_include = NULL) {
-  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
-
-  tmp <- ld$LD
-  colnames(tmp) <- rownames(tmp) <- ld$snp.id
-
-  dat <- tibble::as_tibble(tmp, rownames="variant.id.1") %>%
-    pivot_longer(-variant.id.1, names_to = "variant.id.2", values_to = "ld") %>%
-    mutate(variant.id.1 = as.integer(variant.id.1), variant.id.2 = as.integer(variant.id.2)) %>%
-    filter(variant.id.1 < variant.id.2)
-    #browser() #%>%
-    #arrange(variant.id.1, variant.id.2)
-  names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
-  dat
 }
