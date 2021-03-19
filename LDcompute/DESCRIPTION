@@ -14,8 +14,10 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 License: MIT + file LICENSE
 Imports:
+    dplyr,
     SeqArray,
-    SNPRelate
+    SNPRelate,
+    tibble
 Suggests:
     SeqVarTools,
     devtools,

@@ -19,6 +19,11 @@
 #' * (if `method="r"``) ld_composite: the LD between variant.id.1 and variant.id.2 calculated using the "r" method
 #'
 #' @md
+#'
+#' @importFrom SNPRelate snpgdsLDMat
+#' @importFrom dplyr left_join %>%
+#' @importFrom tibble tibble %>%
+
 
 compute_ld <- function(gds, variant_include_1, variant_include_2 = NULL, methods = c("composite")) {
 
@@ -47,7 +52,7 @@ compute_ld <- function(gds, variant_include_1, variant_include_2 = NULL, methods
   if (length(methods) > 1) {
     for (i in 2:length(methods)) {
       res <- res %>%
-        dplyr::left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
+        left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
     }
   }
   res
@@ -61,7 +66,7 @@ compute_ld <- function(gds, variant_include_1, variant_include_2 = NULL, methods
   ld <- snpgdsLDMat(gds, snp.id = c(variant_include_1, variant_include_2),
                     method = method, slide = -1, verbose = FALSE)
 
-  dat <- tibble::tibble(
+  dat <- tibble(
     variant.id.1 = variant_include_1,
     variant.id.2 = variant_include_2,
     ld = ld$LD[1,2]
