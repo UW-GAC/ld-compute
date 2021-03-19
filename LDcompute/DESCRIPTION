@@ -13,6 +13,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 License: MIT + file LICENSE
+biocViews:
 Imports:
     dplyr,
     SeqArray,
@@ -23,6 +24,5 @@ Suggests:
     devtools,
     roxygen2,
     testthat (>= 3.0.0),
-    withr,
-    covr
+    withr
 Config/testthat/edition: 3
