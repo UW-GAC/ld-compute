@@ -234,25 +234,9 @@ test_that("works with large variant ids", {
   expect_equal(ld$ld_composite[2], chk[3,2])
 })
 
-test_that("all variants on chr22", {
+test_that("100 random variants on chr22", {
   gds <- local_gds()
   seqSetFilterChrom(gds, 22, verbose=FALSE)
-  variant_ids <- seqGetData(gds, "variant.id")
-  seqResetFilter(gds, verbose = FALSE)
-  var1 <- sample(variant_ids, 1)
-  var2 <- setdiff(variant_ids, var1)
-  ld <- compute_ld(gds, var1, var2)
-
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
-  expect_equal(nrow(ld), length(var2))
-  expect_equal(ld$variant.id.1, rep(var1, length(var2)))
-  expect_equal(ld$variant.id.2, sort(var2))
-  expect_true(all(is.numeric(ld$ld_composite)))
-})
-
-test_that("random set of variants", {
-  gds <- local_gds()
-  seqSetFilterChrom(gds, 1, verbose=FALSE)
   variant_ids <- seqGetData(gds, "variant.id")
   seqResetFilter(gds, verbose = FALSE)
   var1 <- sample(variant_ids, 1)
@@ -260,8 +244,8 @@ test_that("random set of variants", {
   ld <- compute_ld(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
-  expect_equal(nrow(ld), 100)
-  expect_equal(ld$variant.id.1, rep(var1, 100))
+  expect_equal(nrow(ld), length(var2))
+  expect_equal(ld$variant.id.1, rep(var1, length(var2)))
   expect_equal(ld$variant.id.2, sort(var2))
   expect_true(all(is.numeric(ld$ld_composite)))
 })

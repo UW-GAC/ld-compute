@@ -17,7 +17,6 @@ test_that("works normally with two variants", {
   expect_equal(ld$ld_composite, chk$LD[1,2])
 })
 
-
 test_that("returns variant ids in correct order with 2 and 10", {
   gds <- local_gds()
   var_include <- c(2, 10)
@@ -33,7 +32,6 @@ test_that("returns variant ids in correct order with 2 and 10", {
   chk <- snpgdsLDMat(gds, snp.id = c(var_include), slide = -1, verbose = FALSE)
   expect_equal(ld$ld_composite, chk$LD[1,2])
 })
-
 
 test_that("works normally with three variants", {
   gds <- local_gds()
@@ -53,6 +51,17 @@ test_that("works normally with three variants", {
   expect_equal(ld$ld_composite[3], chk$LD[2,3])
 })
 
+test_that("100 random variants on chr22", {
+  gds <- local_gds()
+  seqSetFilterChrom(gds, 22, verbose=FALSE)
+  var_include <- sample(seqGetData(gds, "variant.id"), 100)
+  seqResetFilter(gds, verbose = FALSE)
+  ld <- compute_ld(gds, var_include)
+
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(nrow(ld), 100 * 99 / 2)
+  expect_true(all(is.numeric(ld$ld_composite)))
+})
 
 test_that("returns variant ids in a standardized order", {
   gds <- local_gds()
@@ -180,4 +189,39 @@ test_that("sample set", {
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = var_include, sample.id=sample_include, slide = -1, verbose = FALSE)
   expect_equal(ld_sub$ld_composite, chk$LD[upper.tri(chk$LD)])
+})
+
+test_that("works with large variant ids", {
+  gds <- local_gds()
+  var1 <- 10000
+  var2 <- c(10002, 10003)
+  ld <- compute_ld(gds, var1, var2)
+
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(nrow(ld), 2)
+  expect_equal(ld$variant.id.1, c(10000, 10000))
+  expect_equal(ld$variant.id.2, c(10002, 10003))
+  expect_true(is.numeric(ld$ld_composite))
+
+  # Check against the function directly.
+  chk <- snpgdsLDMat(gds, snp.id = c(10000, 10002, 10003), slide = -1, verbose = FALSE)$LD
+  expect_equal(ld$ld_composite, chk[1,2:3])
+})
+
+test_that("duplicated variant ids", {
+  gds <- local_gds()
+  var_include <- c(1, 1, 2, 3)
+  ld <- compute_ld(gds, var_include)
+
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(nrow(ld), 3)
+  expect_equal(ld$variant.id.1, c(1, 1, 2))
+  expect_equal(ld$variant.id.2, c(2, 3, 3))
+  expect_true(is.numeric(ld$ld_composite))
+
+  # Check against the function directly.
+  chk <- snpgdsLDMat(gds, snp.id = c(1, 2, 3), slide = -1, verbose = FALSE)
+  expect_equal(ld$ld_composite[1], chk$LD[1,2])
+  expect_equal(ld$ld_composite[2], chk$LD[1,3])
+  expect_equal(ld$ld_composite[3], chk$LD[2,3])
 })
