@@ -23,5 +23,6 @@ Suggests:
     devtools,
     roxygen2,
     testthat (>= 3.0.0),
-    withr
+    withr,
+    covr
 Config/testthat/edition: 3
