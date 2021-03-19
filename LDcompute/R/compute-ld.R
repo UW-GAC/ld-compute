@@ -4,6 +4,7 @@
 #' @param variant_include_1 A vector of variant ids. See details.
 #' @param variant_include_2 A vector of variant.ids. See details.
 #' @param methods A vector of methods to use to calculate LD. See details.
+#' @param sample_include A vector of sample.ids to use for LD calculation.
 #'
 #' @details
 #' This function is primarily a wrapper around the SNPRelate snpgdsLDMat function.

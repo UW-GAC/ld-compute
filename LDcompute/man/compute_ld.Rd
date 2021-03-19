@@ -20,6 +20,8 @@ compute_ld(
 \item{variant_include_2}{A vector of variant.ids. See details.}
 
 \item{methods}{A vector of methods to use to calculate LD. See details.}
+
+\item{sample_include}{A vector of sample.ids to use for LD calculation.}
 }
 \description{
 Compute LD among variants
