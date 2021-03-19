@@ -80,15 +80,15 @@ compute_ld <- function(
       mutate(variant.id.1 = as.integer(variant.id.1), variant.id.2 = as.integer(variant.id.2))
 
     # Now filter specific to inputs.
-    if (length(variant_include_1 == 1) & length(variant_include_2) == 1) {
+    if (ld_type == "one_to_one") {
       # LD between a pair of variants.
       dat <- dat %>%
         filter(variant.id.1 == variant_include_1, variant.id.2 == variant_include_2)
-    } else if (length(variant_include_1 == 1) & length(variant_include_2) > 1) {
-        # LD between one variant and a set of other variants.
-        dat <- dat %>%
-          filter(variant.id.1 == variant_include_1, variant.id.1 != variant.id.2)
-    } else if (length(variant_include_1 > 1) & length(variant_include_2) == 0) {
+    } else if (ld_type == "one_to_many") {
+      # LD between one variant and a set of other variants.
+      dat <- dat %>%
+        filter(variant.id.1 == variant_include_1, variant.id.1 != variant.id.2)
+    } else if (ld_type == "many_to_many") {
       # LD between all pairs of variants.
       dat <- dat %>%
           filter(variant.id.1 < variant.id.2)
