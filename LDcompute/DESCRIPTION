@@ -18,7 +18,8 @@ Imports:
     dplyr,
     SeqArray,
     SNPRelate,
-    tibble
+    tibble,
+    tidyr
 Suggests:
     SeqVarTools,
     devtools,

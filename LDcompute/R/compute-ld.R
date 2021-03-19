@@ -21,7 +21,8 @@
 #' @md
 #'
 #' @importFrom SNPRelate snpgdsLDMat
-#' @importFrom dplyr left_join %>%
+#' @importFrom dplyr left_join %>% mutate filter
+#' @importFrom tidyr pivot_longer %>%
 #' @importFrom tibble tibble %>%
 
 

@@ -8,7 +8,8 @@ compute_ld(
   gds,
   variant_include_1,
   variant_include_2 = NULL,
-  methods = c("composite")
+  methods = c("composite"),
+  sample_include = NULL
 )
 }
 \arguments{
