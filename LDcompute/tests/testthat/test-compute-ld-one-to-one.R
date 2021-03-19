@@ -125,10 +125,15 @@ test_that("multiple methods are allowed", {
   expect_equal(names(ld_full), c("variant.id.1", "variant.id.2", "ld_composite", "ld_dprime", "ld_corr", "ld_r"))
   expect_equal(ld_full$variant.id.1, var1)
   expect_equal(ld_full$variant.id.2, var2)
+  expect_equal(ld_full$ld_composite, ld_composite$ld_composite)
+  expect_equal(ld_full$ld_dprime, ld_dprime$ld_dprime)
+  expect_equal(ld_full$ld_corr, ld_corr$ld_corr)
+  expect_equal(ld_full$ld_r, ld_r$ld_r)
+
 
   # Method not allowed.
-  #expect_error(compute_ld(gds, var1, var2, method = "r"), "allowed methods")
-})
+  expect_error(compute_ld(gds, var1, var2, method = c("r", "foo")), "allowed methods")
+ })
 
 test_that("different chromosomes", {
   skip("what do we want to happen?")
