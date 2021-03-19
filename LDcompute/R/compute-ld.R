@@ -34,6 +34,8 @@ compute_ld <- function(
 ) {
 
   # Checks - to be written.
+  # * all sample ids exist.
+  # * all variant ids exist.
 
   # Check that method is allowed
 
@@ -44,18 +46,32 @@ compute_ld <- function(
     stop(msg)
   }
 
-  # Choose which method to call - to be written.
   res_list <- list()
-  for (method in methods) {
-  # Compute LD for a pair of variants.
-    res_list[[method]] <- .compute_ld_one_to_one(
-      gds,
-      variant_include_1,
-      variant_include_2,
-      method,
-      sample_include = sample_include
-    )
+  # Figure out which subfunction to call.
+  if (length(variant_include_1) == 1 & length(variant_include_2) == 1) {
+    for (method in methods) {
+    # Compute LD for a pair of variants.
+      res_list[[method]] <- .compute_ld_one_to_one(
+        gds,
+        variant_include_1,
+        variant_include_2,
+        method,
+        sample_include = sample_include
+      )
+    }
+  } else if (length(variant_include_1) > 1 & length(variant_include_2) == 0) {
+    for (method in methods) {
+      # Compute LD for a pair of variants.
+        res_list[[method]] <- .compute_ld_many_to_many(
+          gds,
+          variant_include_1,
+          method,
+          sample_include = sample_include
+        )
+      }
   }
+
+  # Choose which method to call - to be written.
 
   # Add other methods to the data frame as columns.
   # This is probably slow.
@@ -91,4 +107,18 @@ compute_ld <- function(
 .compute_ld_one_to_many <- function() {}
 
 # Computes LD between all pairs of a set of variants.
-.compute_ld_many_to_many <- function() {}
+.compute_ld_many_to_many <- function(gds, variant_include, method, sample_include = NULL) {
+  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
+
+  tmp <- ld$LD
+  colnames(tmp) <- rownames(tmp) <- ld$snp.id
+
+  dat <- tibble::as_tibble(tmp, rownames="variant.id.1") %>%
+    pivot_longer(-variant.id.1, names_to = "variant.id.2", values_to = "ld") %>%
+    mutate(variant.id.1 = as.integer(variant.id.1), variant.id.2 = as.integer(variant.id.2)) %>%
+    filter(variant.id.1 < variant.id.2)
+    #browser() #%>%
+    #arrange(variant.id.1, variant.id.2)
+  names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
+  dat
+}
