@@ -36,16 +36,34 @@ compute_ld <- function(
 ) {
 
   # Checks - to be written.
-  # * all sample ids exist.
-  # * all variant ids exist.
 
-  # Check that method is allowed
-
+  ## Check that method is allowed
   allowed_methods <- c("composite", "dprime", "corr", "r")
   if (!all(methods %in% allowed_methods)) {
     msg <- sprintf("method is not in set of allowed methods: %s",
                    paste(allowed_methods, collapse = ", "))
     stop(msg)
+  }
+
+  ## * all sample ids and variant ids exist.
+  # It's probably faster to let SeqArray handle these errors than to try to check them ourselves.
+
+  ## variant_include_1 and variant_include_2 are set properly.
+  if (length(variant_include_1) == 1) {
+    if (length(variant_include_2) == 1) {
+      ld_type <- "one_to_one"
+    } else if (length(variant_include_2) > 1) {
+      ld_type <- "one_to_many"
+    } else {
+      stop("variant_include_2 must be specified if variant_include_1 contains one variant!")
+    }
+  }
+  if (length(variant_include_1) > 1) {
+    if (!is.null(variant_include_2)) {
+      stop("variant_include_2 must be NULL if variant_include_1 contains multiple variants!")
+    } else {
+      ld_type <- "many_to_many"
+    }
   }
 
   variant_include <- unique(c(variant_include_1, variant_include_2))
