@@ -8,3 +8,5 @@ install:
   - Rscript -e 'install.packages(c("devtools","roxygen2","testthat", "BiocManager")); BiocManager::install("SeqVarTools"); devtools::install_deps("LDcompute")'
 script:
   - Rscript -e 'devtools::check("LDcompute")'
+after_success:
+  - Rscript -e 'covr::codecov("LDcompute")'
