@@ -46,7 +46,7 @@ compute_ld <- function(
     stop(msg)
   }
 
-  variant_include <- c(variant_include_1, variant_include_2)
+  variant_include <- unique(c(variant_include_1, variant_include_2))
 
   res_list <- list()
   for (method in methods) {
@@ -64,11 +64,14 @@ compute_ld <- function(
       # LD between a pair of variants.
       dat <- dat %>%
         filter(variant.id.1 == variant_include_1, variant.id.2 == variant_include_2)
+    } else if (length(variant_include_1 == 1) & length(variant_include_2) > 1) {
+        # LD between one variant and a set of other variants.
+        dat <- dat %>%
+          filter(variant.id.1 == variant_include_1, variant.id.1 != variant.id.2)
     } else if (length(variant_include_1 > 1) & length(variant_include_2) == 0) {
       # LD between all pairs of variants.
       dat <- dat %>%
           filter(variant.id.1 < variant.id.2)
-
     }
 
     names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
