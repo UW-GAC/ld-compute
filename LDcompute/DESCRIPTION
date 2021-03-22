@@ -17,11 +17,11 @@ BiocViews:
 Imports:
     dplyr,
     SeqArray,
+    SeqVarTools,
     SNPRelate,
     tibble,
     tidyr
 Suggests:
-    SeqVarTools,
     devtools,
     roxygen2,
     testthat (>= 3.0.0),
