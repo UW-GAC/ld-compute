@@ -22,8 +22,8 @@
 #' @md
 #'
 #' @importFrom SNPRelate snpgdsLDMat
-#' @importFrom dplyr left_join %>% mutate filter
-#' @importFrom tidyr pivot_longer %>%
+#' @importFrom dplyr left_join %>% filter
+#' @importFrom tidyr %>%
 #' @importFrom tibble tibble %>%
 
 
@@ -75,11 +75,13 @@ compute_ld <- function(
     ## Could fix by looping over blocks of variants.
     ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
     tmp <- ld$LD
-    colnames(tmp) <- rownames(tmp) <- ld$snp.id
 
-    dat <- tibble::as_tibble(tmp, rownames="variant.id.1") %>%
-      pivot_longer(-variant.id.1, names_to = "variant.id.2", values_to = "ld") %>%
-      mutate(variant.id.1 = as.integer(variant.id.1), variant.id.2 = as.integer(variant.id.2))
+    # Convert to data frame.
+    dat <- tibble::tibble(
+      variant.id.1 = rep(ld$snp.id, each = length(variant_include)),
+      variant.id.2 = rep(ld$snp.id, times = length(variant_include)),
+      ld = as.vector(ld$LD)
+    )
 
     # Now filter specific to inputs.
     if (ld_type == "one_to_one") {
