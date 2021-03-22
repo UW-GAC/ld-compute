@@ -22,7 +22,7 @@
 #' @md
 #'
 #' @importFrom SNPRelate snpgdsLDMat
-#' @importFrom dplyr left_join %>% filter
+#' @importFrom dplyr left_join %>% filter .data
 #' @importFrom tidyr %>%
 #' @importFrom tibble tibble %>%
 
@@ -87,15 +87,15 @@ compute_ld <- function(
     if (ld_type == "one_to_one") {
       # LD between a pair of variants.
       dat <- dat %>%
-        filter(variant.id.1 == variant_include_1, variant.id.2 == variant_include_2)
+        filter(.data$variant.id.1 == variant_include_1, .data$variant.id.2 == variant_include_2)
     } else if (ld_type == "one_to_many") {
       # LD between one variant and a set of other variants.
       dat <- dat %>%
-        filter(variant.id.1 == variant_include_1, variant.id.1 != variant.id.2)
+        filter(.data$variant.id.1 == variant_include_1, .data$variant.id.1 != .data$variant.id.2)
     } else if (ld_type == "many_to_many") {
       # LD between all pairs of variants.
       dat <- dat %>%
-          filter(variant.id.1 < variant.id.2)
+          filter(.data$variant.id.1 < .data$variant.id.2)
     }
 
     names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)

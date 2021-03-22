@@ -2,10 +2,9 @@
 
 importFrom(SNPRelate,snpgdsLDMat)
 importFrom(dplyr,"%>%")
+importFrom(dplyr,.data)
 importFrom(dplyr,filter)
 importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
 importFrom(tibble,"%>%")
 importFrom(tibble,tibble)
 importFrom(tidyr,"%>%")
-importFrom(tidyr,pivot_longer)
