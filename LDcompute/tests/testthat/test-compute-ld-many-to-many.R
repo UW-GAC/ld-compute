@@ -54,7 +54,7 @@ test_that("works normally with three variants", {
 test_that("100 random variants on chr22", {
   gds <- local_gds()
   seqSetFilterChrom(gds, 22, verbose=FALSE)
-  var_include <- sample(seqGetData(gds, "variant.id"), 100)
+  var_include <- sample(seqGetData(gds, "variant.id")[nAlleles(gds) == 2], 100)
   seqResetFilter(gds, verbose = FALSE)
   ld <- compute_ld(gds, var_include)
 
@@ -92,7 +92,7 @@ test_that("multiallelic variants", {
   var_multi <- variant_ids[nAlleles(gds) > 2][1]
   var_bi <- variant_ids[nAlleles(gds) == 2][1]
 
-  ld <- compute_ld(gds, c(var_multi, var_bi))
+  expect_warning(ld <- compute_ld(gds, c(var_multi, var_bi)), "multiallelic")
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 1)
@@ -194,17 +194,17 @@ test_that("sample set", {
 test_that("works with large variant ids", {
   gds <- local_gds()
   var1 <- 10000
-  var2 <- c(10002, 10003)
+  var2 <- c(10003, 10004)
   ld <- compute_ld(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
   expect_equal(ld$variant.id.1, c(10000, 10000))
-  expect_equal(ld$variant.id.2, c(10002, 10003))
+  expect_equal(ld$variant.id.2, c(10003, 10004))
   expect_true(is.numeric(ld$ld_composite))
 
   # Check against the function directly.
-  chk <- snpgdsLDMat(gds, snp.id = c(10000, 10002, 10003), slide = -1, verbose = FALSE)$LD
+  chk <- snpgdsLDMat(gds, snp.id = c(10000, 10003, 10004), slide = -1, verbose = FALSE)$LD
   expect_equal(ld$ld_composite, chk[1,2:3])
 })
 

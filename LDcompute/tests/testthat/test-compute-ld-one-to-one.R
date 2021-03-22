@@ -74,7 +74,7 @@ test_that("multiallelic variants", {
   var1 <- which(nAlleles(gds) > 2)[1]
   var2 <- which(nAlleles(gds) == 2)[1]
 
-  ld <- compute_ld(gds, var1, var2)
+  expect_warning(ld <- compute_ld(gds, var1, var2), "multiallelic")
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 1)

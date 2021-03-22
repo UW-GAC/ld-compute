@@ -32,3 +32,15 @@ test_that("non-existing variant_include", {
   var2 <- max(variant_ids) + c(1, 2)
   expect_error(compute_ld(gds, variant_include_1 = var1, variant_include_2 = var2), "snp.id")
 })
+
+test_that("warning with multiallelic variants", {
+  gds <- local_gds()
+  variant_ids <- seqGetData(gds, "variant.id")
+  multi <- which(nAlleles(gds) > 2)
+  bi <- which(nAlleles(gds) == 2)
+
+  expect_warning(compute_ld(gds, variant_include_1 = multi[1], variant_include_2 = bi[1]), "multiallelic")
+  expect_warning(compute_ld(gds, variant_include_1 = bi[1], variant_include_2 = multi[1]), "multiallelic")
+  expect_warning(compute_ld(gds, variant_include_1 = c(multi[1], bi[1])), "multiallelic")
+  expect_warning(compute_ld(gds, variant_include_1 = c(bi[1], multi[1])), "multiallelic")
+})

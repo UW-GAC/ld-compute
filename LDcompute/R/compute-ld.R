@@ -77,6 +77,13 @@ compute_ld <- function(
 
   variant_include <- unique(c(variant_include_1, variant_include_2))
 
+  # Check for multiallelic variants.
+  seqSetFilter(gds, variant.id = variant_include, verbose = FALSE)
+  if (any(nAlleles(gds) > 2)) {
+    warning("multiallelic variants specified; LD calculation is not specific to each alternate allele.")
+  }
+  seqResetFilter(gds, verbose = FALSE)
+
   res_list <- list()
   for (method in methods) {
     # Calculate ld between all pairs of variants provided.

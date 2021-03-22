@@ -111,7 +111,7 @@ test_that("multiallelic variants", {
   var1 <- variant_ids[nAlleles(gds) == 2][1]
   var2 <- variant_ids[nAlleles(gds) > 2][1:2]
 
-  ld <- compute_ld(gds, var1, var2)
+  expect_warning(ld <- compute_ld(gds, var1, var2), "multiallelic")
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
@@ -236,8 +236,9 @@ test_that("works with large variant ids", {
 
 test_that("100 random variants on chr22", {
   gds <- local_gds()
+  # only biallelic
   seqSetFilterChrom(gds, 22, verbose=FALSE)
-  variant_ids <- seqGetData(gds, "variant.id")
+  variant_ids <- seqGetData(gds, "variant.id")[nAlleles(gds) == 2]
   seqResetFilter(gds, verbose = FALSE)
   var1 <- sample(variant_ids, 1)
   var2 <- sample(setdiff(variant_ids, var1), 100)
