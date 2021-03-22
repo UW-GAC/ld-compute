@@ -8,16 +8,25 @@
 #'
 #' @details
 #' This function is primarily a wrapper around the SNPRelate snpgdsLDMat function.
-#' It allows LD calculations between a pair of variants and returns results in a consistent format.
+#' It allows LD calculations between a pair of variants, one variant and a set of other variants, and all pairs within a set of variants,
+#' and returns results in a consistent format.
 #'
-#' @value
+#' The type of LD calculation is determined by how `variant_include_1` and `variant_include_2` are set.
+#' * a pair of variants: set `variant.id.1` to one variant.id in the pair and `variant.id.2` to the other variant.id in the pair.
+#' * one variant and a set of other variants: set `variant.id.1` to the variant.id and `variant.id.2` to the variant.ids for which LD should be calculated with respect to `variant.id.1`
+#' * all pairs in a set of variants: set `variant.id.1` to a vector of variant ids and leave `variant.id.2` as `NULL`.
+#'
+#' @return
 #' A data frame with the following columns:
 #' * variant.id.1: the first variant id in the pair
 #' * variant.id.2: the second variant id in the pair
-#' * (if `method="composite"``) ld_composite: the LD between variant.id.1 and variant.id.2 calculated using the "composite" method
-#' * (if `method="dprime"``) ld_composite: the LD between variant.id.1 and variant.id.2 calculated using the "dprime" method
-#' * (if `method="corr"``) ld_composite: the LD between variant.id.1 and variant.id.2 calculated using the "corr" method
-#' * (if `method="r"``) ld_composite: the LD between variant.id.1 and variant.id.2 calculated using the "r" method
+#' * One column for each method specified giving the LD btween `variant.id.1` and `variant.id.2` using the specified method:
+#'     * if `methods` contains `"composite"`: `ld_composite`
+#'     * if `methods` contains `dprime`: `"ld_dprime"`
+#'     * if `methods` contains `"corr"`: `ld_corr`
+#'     * if `methods` contains `"r"`: `ld_r`
+#'
+#' Each pair of variants only has one record in the data frame.
 #'
 #' @md
 #'

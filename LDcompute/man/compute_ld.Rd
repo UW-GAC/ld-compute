@@ -23,10 +23,34 @@ compute_ld(
 
 \item{sample_include}{A vector of sample.ids to use for LD calculation.}
 }
+\value{
+A data frame with the following columns:
+\itemize{
+\item variant.id.1: the first variant id in the pair
+\item variant.id.2: the second variant id in the pair
+\item One column for each method specified giving the LD btween \code{variant.id.1} and \code{variant.id.2} using the specified method:
+\itemize{
+\item if \code{methods} contains \code{"composite"}: \code{ld_composite}
+\item if \code{methods} contains \code{dprime}: \code{"ld_dprime"}
+\item if \code{methods} contains \code{"corr"}: \code{ld_corr}
+\item if \code{methods} contains \code{"r"}: \code{ld_r}
+}
+}
+
+Each pair of variants only has one record in the data frame.
+}
 \description{
 Compute LD among variants
 }
 \details{
 This function is primarily a wrapper around the SNPRelate snpgdsLDMat function.
-It allows LD calculations between a pair of variants and returns results in a consistent format.
+It allows LD calculations between a pair of variants, one variant and a set of other variants, and all pairs within a set of variants,
+and returns results in a consistent format.
+
+The type of LD calculation is determined by how \code{variant_include_1} and \code{variant_include_2} are set.
+\itemize{
+\item a pair of variants: set \code{variant.id.1} to one variant.id in the pair and \code{variant.id.2} to the other variant.id in the pair.
+\item one variant and a set of other variants: set \code{variant.id.1} to the variant.id and \code{variant.id.2} to the variant.ids for which LD should be calculated with respect to \code{variant.id.1}
+\item all pairs in a set of variants: set \code{variant.id.1} to a vector of variant ids and leave \code{variant.id.2} as \code{NULL}.
+}
 }
