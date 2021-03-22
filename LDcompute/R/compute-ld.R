@@ -23,6 +23,7 @@
 #'
 #' @md
 #'
+#' @importFrom SeqArray seqSetFilter seqResetFilter
 #' @importFrom SNPRelate snpgdsLDMat
 #' @importFrom dplyr left_join %>% filter .data
 #'
@@ -85,6 +86,7 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #'
 #' @md
 #'
+#' @importFrom SeqArray seqSetFilter seqResetFilter
 #' @importFrom SNPRelate snpgdsLDMat
 #' @importFrom dplyr left_join %>% filter .data
 #'
@@ -148,6 +150,7 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #'
 #' @md
 #'
+#' @importFrom SeqArray seqSetFilter seqResetFilter
 #' @importFrom SNPRelate snpgdsLDMat
 #' @importFrom dplyr left_join %>% filter .data
 #'
@@ -226,7 +229,7 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
 .check_ld_multiallelic <- function(gds, variant_include){
   # Check for multiallelic variants.
   seqSetFilter(gds, variant.id = variant_include, verbose = FALSE)
-  if (any(nAlleles(gds) > 2)) {
+  if (any(SeqVarTools::nAlleles(gds) > 2)) {
     warning("multiallelic variants specified; LD calculation is not specific to each alternate allele.")
   }
   seqResetFilter(gds, verbose = FALSE)
