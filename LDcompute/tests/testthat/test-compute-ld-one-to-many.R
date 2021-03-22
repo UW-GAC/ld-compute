@@ -5,7 +5,7 @@ test_that("works normally with two variants", {
   gds <- local_gds()
   var1 <- 1
   var2 <- c(2, 3)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
@@ -23,7 +23,7 @@ test_that("works with duplicated variants between var_include_1 and var_include_
   gds <- local_gds()
   var1 <- 1
   var2 <- c(1, 2)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 1)
@@ -40,7 +40,7 @@ test_that("works normally with three variants", {
   gds <- local_gds()
   var1 <- 1
   var2 <- c(2, 3, 5)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 3)
@@ -57,7 +57,7 @@ test_that("returns ids in the correct order", {
   gds <- local_gds()
   var1 <- 1
   var2 <- c(2, 4, 3)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 3)
@@ -74,7 +74,7 @@ test_that("variant_include_1 is not the lowest variant id", {
   gds <- local_gds()
   var1 <- 2
   var2 <- c(1, 3, 4)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 3)
@@ -94,7 +94,7 @@ test_that("missing data", {
   var1 <- variant_ids[missing_rate > 0][1]
   var2 <- variant_ids[missing_rate == 0][1:2]
 
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
@@ -111,7 +111,7 @@ test_that("multiallelic variants", {
   var1 <- variant_ids[nAlleles(gds) == 2][1]
   var2 <- variant_ids[nAlleles(gds) > 2][1:2]
 
-  expect_warning(ld <- compute_ld(gds, var1, var2), "multiallelic")
+  expect_warning(ld <- compute_ld_index(gds, var1, var2), "multiallelic")
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
@@ -127,7 +127,7 @@ test_that("different methods", {
   var1 <- 1
   var2 <- c(2, 3)
 
-  ld <- compute_ld(gds, var1, var2, methods = "composite")
+  ld <- compute_ld_index(gds, var1, var2, methods = "composite")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
   expect_equal(ld$variant.id.1, c(1, 1))
@@ -135,7 +135,7 @@ test_that("different methods", {
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "composite", slide = -1, verbose = FALSE)
   expect_equal(ld$ld_composite, chk$LD[1,2:3])
 
-  ld <- compute_ld(gds, var1, var2, methods = "dprime")
+  ld <- compute_ld_index(gds, var1, var2, methods = "dprime")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_dprime"))
   expect_equal(nrow(ld), 2)
   expect_equal(ld$variant.id.1, c(1, 1))
@@ -143,7 +143,7 @@ test_that("different methods", {
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "dprime", slide = -1, verbose = FALSE)
   expect_equal(ld$ld_dprime, chk$LD[1,2:3])
 
-  ld <- compute_ld(gds, var1, var2, method = "corr")
+  ld <- compute_ld_index(gds, var1, var2, method = "corr")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_corr"))
   expect_equal(nrow(ld), 2)
   expect_equal(ld$variant.id.1, c(1, 1))
@@ -151,7 +151,7 @@ test_that("different methods", {
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "corr", slide = -1, verbose = FALSE)
   expect_equal(ld$ld_corr, chk$LD[1,2:3])
 
-  ld <- compute_ld(gds, var1, var2, method = "r")
+  ld <- compute_ld_index(gds, var1, var2, method = "r")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r"))
   expect_equal(nrow(ld), 2)
   expect_equal(ld$variant.id.1, c(1, 1))
@@ -160,7 +160,7 @@ test_that("different methods", {
   expect_equal(ld$ld_r, chk$LD[1,2:3])
 
   # Method not allowed.
-  expect_error(compute_ld(gds, var1, var2, method = "foo"), "allowed methods")
+  expect_error(compute_ld_index(gds, var1, var2, method = "foo"), "allowed methods")
 
 })
 
@@ -169,12 +169,12 @@ test_that("multiple methods are allowed", {
   var1 <- 1
   var2 <- c(2, 3)
 
-  ld_composite <- compute_ld(gds, var1, var2, methods = "composite")
-  ld_dprime <- compute_ld(gds, var1, var2, methods = "dprime")
-  ld_corr <- compute_ld(gds, var1, var2, method = "corr")
-  ld_r <- compute_ld(gds, var1, var2, method = "r")
+  ld_composite <- compute_ld_index(gds, var1, var2, methods = "composite")
+  ld_dprime <- compute_ld_index(gds, var1, var2, methods = "dprime")
+  ld_corr <- compute_ld_index(gds, var1, var2, method = "corr")
+  ld_r <- compute_ld_index(gds, var1, var2, method = "r")
 
-  ld_full <- compute_ld(gds, var1, var2, methods = c("composite", "dprime", "corr", "r"))
+  ld_full <- compute_ld_index(gds, var1, var2, methods = c("composite", "dprime", "corr", "r"))
   expect_equal(names(ld_full), c("variant.id.1", "variant.id.2", "ld_composite", "ld_dprime", "ld_corr", "ld_r"))
   expect_equal(ld_full$variant.id.1, c(var1, var1))
   expect_equal(ld_full$variant.id.2, var2)
@@ -184,7 +184,7 @@ test_that("multiple methods are allowed", {
   expect_equal(ld_full$ld_r, ld_r$ld_r)
 
   # Method not allowed.
-  expect_error(compute_ld(gds, var1, var2, method = c("r", "foo")), "allowed methods")
+  expect_error(compute_ld_index(gds, var1, var2, method = c("r", "foo")), "allowed methods")
  })
 
 test_that("different chromosomes", {
@@ -199,8 +199,8 @@ test_that("sample set", {
   sample_ids <- seqGetData(gds, "sample.id")
   sample_include <- sample_ids[1:500]
 
-  ld_all <- compute_ld(gds, var1, var2)
-  ld_sub <- compute_ld(gds, var1, var2, sample_include = sample_include)
+  ld_all <- compute_ld_index(gds, var1, var2)
+  ld_sub <- compute_ld_index(gds, var1, var2, sample_include = sample_include)
 
   expect_equal(names(ld_sub), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld_sub), 2)
@@ -220,7 +220,7 @@ test_that("works with large variant ids", {
   gds <- local_gds()
   var1 <- 10000
   var2 <- c(2, 3)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), 2)
@@ -242,11 +242,36 @@ test_that("100 random variants on chr22", {
   seqResetFilter(gds, verbose = FALSE)
   var1 <- sample(variant_ids, 1)
   var2 <- sample(setdiff(variant_ids, var1), 100)
-  ld <- compute_ld(gds, var1, var2)
+  ld <- compute_ld_index(gds, var1, var2)
 
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
   expect_equal(nrow(ld), length(var2))
   expect_equal(ld$variant.id.1, rep(var1, length(var2)))
   expect_equal(ld$variant.id.2, sort(var2))
   expect_true(all(is.numeric(ld$ld_composite)))
+})
+
+test_that("non-existing sample_include", {
+  gds <- local_gds()
+  sample_include <- letters[1:10]
+  expect_error(compute_ld_index(gds, 1, c(2, 3), sample_include = sample_include), "sample.id")
+})
+
+test_that("non-existing variant_include", {
+  gds <- local_gds()
+  variant_ids <- seqGetData(gds, "variant.id")
+  max_var <- max(variant_ids)
+  expect_error(compute_ld_index(gds, 1, max_var + 1), "snp.id") # one is missing
+  expect_error(compute_ld_index(gds, max_var + 1, 1), "snp.id") # one is missing
+  expect_error(compute_ld_index(gds, max_var + 1, c(1, max_var + 2)), "snp.id") # both are missing
+})
+
+test_that("warning with multiallelic variants", {
+  gds <- local_gds()
+  variant_ids <- seqGetData(gds, "variant.id")
+  multi <- variant_ids[nAlleles(gds) > 2]
+  bi <- variant_ids[nAlleles(gds) == 2]
+
+  expect_warning(compute_ld_index(gds, bi[1], c(bi[2], multi[1])), "multiallelic")
+  expect_warning(compute_ld_index(gds, multi[1], c(bi[1], multi[2])), "multiallelic")
 })

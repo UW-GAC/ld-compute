@@ -36,85 +36,53 @@
 #' @importFrom tibble tibble %>%
 
 
-compute_ld <- function(
-  gds,
-  variant_include_1,
-  variant_include_2 = NULL,
-  methods = c("composite"),
-  sample_include = NULL
-) {
+compute_ld_pair <- function (gds, variant_include_1, variant_include_2, methods = "composite", sample_include = NULL) {
+
+    # Checks - to be written.
+    .check_ld_methods(methods)
+
+    variant_include <- unique(c(variant_include_1, variant_include_2))
+
+    .check_ld_multiallelic(gds, variant_include)
+
+
+    res_list <- list()
+    for (method in methods) {
+      # Calculate ld between all pairs of variants provided.
+      dat <- .compute_ld_matrix(gds, variant_include, method, sample_include = sample_include) %>%
+          filter(.data$variant.id.1 == variant_include_1, .data$variant.id.2 == variant_include_2)
+      res_list[[method]] <- dat
+    }
+
+    # This will be slow.
+    # We can probably speed it up by just adding columns to the final data frame.
+    # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
+    res <- res_list[[1]]
+    if (length(methods) > 1) {
+      for (i in 2:length(methods)) {
+        res <- res %>%
+          left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
+      }
+    }
+    res
+
+}
+
+compute_ld_set <- function(gds, variant_include, methods = "composite", sample_include = NULL) {
 
   # Checks - to be written.
+  .check_ld_methods(methods)
 
-  ## Check that method is allowed
-  allowed_methods <- c("composite", "dprime", "corr", "r")
-  if (!all(methods %in% allowed_methods)) {
-    msg <- sprintf("method is not in set of allowed methods: %s",
-                   paste(allowed_methods, collapse = ", "))
-    stop(msg)
-  }
+  # Handle duplicated variants.
+  variant_include <- unique(variant_include)
 
-  ## * all sample ids and variant ids exist.
-  # It's probably faster to let SeqArray handle these errors than to try to check them ourselves.
-
-  ## variant_include_1 and variant_include_2 are set properly.
-  if (length(variant_include_1) == 1) {
-    if (length(variant_include_2) == 1) {
-      ld_type <- "one_to_one"
-    } else if (length(variant_include_2) > 1) {
-      ld_type <- "one_to_many"
-    } else {
-      stop("variant_include_2 must be specified if variant_include_1 contains one variant!")
-    }
-  }
-  if (length(variant_include_1) > 1) {
-    if (!is.null(variant_include_2)) {
-      stop("variant_include_2 must be NULL if variant_include_1 contains multiple variants!")
-    } else {
-      ld_type <- "many_to_many"
-    }
-  }
-
-  variant_include <- unique(c(variant_include_1, variant_include_2))
-
-  # Check for multiallelic variants.
-  seqSetFilter(gds, variant.id = variant_include, verbose = FALSE)
-  if (any(nAlleles(gds) > 2)) {
-    warning("multiallelic variants specified; LD calculation is not specific to each alternate allele.")
-  }
-  seqResetFilter(gds, verbose = FALSE)
+  .check_ld_multiallelic(gds, variant_include)
 
   res_list <- list()
   for (method in methods) {
     # Calculate ld between all pairs of variants provided.
-    ## This will be memory intensive if calculating LD for many variant.ids.
-    ## Could fix by looping over blocks of variants.
-    ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
-    tmp <- ld$LD
-
-    # Convert to data frame.
-    dat <- tibble::tibble(
-      variant.id.1 = rep(ld$snp.id, each = length(variant_include)),
-      variant.id.2 = rep(ld$snp.id, times = length(variant_include)),
-      ld = as.vector(ld$LD)
-    )
-
-    # Now filter specific to inputs.
-    if (ld_type == "one_to_one") {
-      # LD between a pair of variants.
-      dat <- dat %>%
-        filter(.data$variant.id.1 == variant_include_1, .data$variant.id.2 == variant_include_2)
-    } else if (ld_type == "one_to_many") {
-      # LD between one variant and a set of other variants.
-      dat <- dat %>%
-        filter(.data$variant.id.1 == variant_include_1, .data$variant.id.1 != .data$variant.id.2)
-    } else if (ld_type == "many_to_many") {
-      # LD between all pairs of variants.
-      dat <- dat %>%
-          filter(.data$variant.id.1 < .data$variant.id.2)
-    }
-
-    names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
+    dat <- .compute_ld_matrix(gds, variant_include, method, sample_include = sample_include) %>%
+        filter(.data$variant.id.1 < .data$variant.id.2)
     res_list[[method]] <- dat
   }
 
@@ -129,4 +97,80 @@ compute_ld <- function(
     }
   }
   res
+
+}
+
+compute_ld_index <- function (gds, reference_variant, variant_include, methods = "composite", sample_include = NULL) {
+
+  # Checks - to be written.
+  .check_ld_methods(methods)
+
+  all_variants <- unique(c(reference_variant, variant_include))
+
+  .check_ld_multiallelic(gds, all_variants)
+
+  res_list <- list()
+  for (method in methods) {
+    # Calculate ld between all pairs of variants provided.
+    dat <- .compute_ld_matrix(gds, all_variants, method, sample_include = sample_include) %>%
+      filter(
+        .data$variant.id.1 == reference_variant, .data$variant.id.2 %in% variant_include,
+        # not with itself.
+        .data$variant.id.1 != .data$variant.id.2
+      )
+    res_list[[method]] <- dat
+  }
+  # This will be slow.
+  # We can probably speed it up by just adding columns to the final data frame.
+  # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
+  res <- res_list[[1]]
+  if (length(methods) > 1) {
+    for (i in 2:length(methods)) {
+      res <- res %>%
+        left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
+    }
+  }
+  res
+
+}
+
+# Helper functions.
+.compute_ld_matrix <- function(gds, variant_include, method, methods = "composite", sample_include = NULL) {
+  # Calculate ld between all pairs of variants provided.
+  ## This will be memory intensive if calculating LD for many variant.ids.
+  ## Could fix by looping over blocks of variants.
+  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
+  tmp <- ld$LD
+
+  # Convert to data frame.
+  dat <- tibble::tibble(
+    variant.id.1 = rep(ld$snp.id, each = length(variant_include)),
+    variant.id.2 = rep(ld$snp.id, times = length(variant_include)),
+    ld = as.vector(ld$LD)
+  )
+
+  # Set names to reflect ld method.
+  names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
+
+  dat
+}
+
+.check_ld_methods <- function(methods) {
+  ## Check that method is allowed
+  allowed_methods <- c("composite", "dprime", "corr", "r")
+  if (!all(methods %in% allowed_methods)) {
+    msg <- sprintf("method is not in set of allowed methods: %s",
+                   paste(allowed_methods, collapse = ", "))
+    stop(msg)
+  }
+}
+
+.check_ld_multiallelic <- function(gds, variant_include){
+  # Check for multiallelic variants.
+  seqSetFilter(gds, variant.id = variant_include, verbose = FALSE)
+  if (any(nAlleles(gds) > 2)) {
+    warning("multiallelic variants specified; LD calculation is not specific to each alternate allele.")
+  }
+  seqResetFilter(gds, verbose = FALSE)
+
 }
