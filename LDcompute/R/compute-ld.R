@@ -71,6 +71,8 @@ compute_ld <- function(
   res_list <- list()
   for (method in methods) {
     # Calculate ld between all pairs of variants provided.
+    ## This will be memory intensive if calculating LD for many variant.ids.
+    ## Could fix by looping over blocks of variants.
     ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
     tmp <- ld$LD
     colnames(tmp) <- rownames(tmp) <- ld$snp.id
