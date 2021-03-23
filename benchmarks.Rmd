@@ -1,0 +1,239 @@
+---
+title: Time and memory benchmarks for LD calculation code
+author: "Adrienne Stilp"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    keep_md: true
+---
+
+
+```{r knitr-setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width=120)
+```
+
+```{r library-setup, message = FALSE, echo=FALSE}
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(microbenchmark)
+
+library(SeqVarTools)
+devtools::load_all("LDcompute")
+
+UNIT <- "ms"
+```
+
+# GDS prep
+
+```{r}
+gds <- seqOpen("testdata/1KG_phase3_subset.gds")
+variant_info <- variantInfo(gds) %>%
+  mutate(
+    n_alleles = nAlleles(gds),
+    af = alleleFrequency(gds),
+    maf = pmin(af, 1 - af)
+  ) %>%
+  filter(n_alleles == 2, maf > 0.1)
+sample_ids <- seqGetData(gds, "sample.id")
+```
+
+# Pair of variants
+
+```{r}
+set.seed(123)
+variant_pair <- variant_info %>%
+  sample_n(2)
+variant_pair
+var1 <- variant_pair$variant.id[1]
+var2 <- variant_pair$variant.id[2]
+```
+
+## Sample size
+
+```{r}
+set.seed(123)
+
+bm <- microbenchmark(
+  "10" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:10]),
+  "50" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:50]),
+  "100" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:100]),
+  "500" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:500]),
+  "1000" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000]),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  n_samples = as.integer(as.character(bm$expr)),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = n_samples, y = time, group = n_samples)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+summary(bm) %>%
+  kable()
+```
+
+## Number of variants
+
+Irrelevant for `compute_ld_pair`.
+
+## Method types
+
+```{r}
+bm <- microbenchmark(
+  "composite" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "composite"),
+  "dprime" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "dprime"),
+  "corr" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "corr"),
+  "r" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "r"),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  method = as.character(bm$expr),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = method, y = time, group = method)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+
+summary(bm) %>%
+  kable()
+```
+
+## Number of methods
+
+```{r}
+set.seed(123)
+sample_ids <- seqGetData(gds, "sample.id")[1:1000]
+
+bm <- microbenchmark(
+  "1" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "composite"),
+  "2" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime")),
+  "3" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime", "corr")),
+  "4" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime", "corr", "r")),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  n_methods = as.integer(as.character(bm$expr)),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = n_methods, y = time, group = n_methods)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+summary(bm) %>%
+  kable()
+```
+
+# Index variant
+
+```{r}
+index_variant <- variant_info %>%
+  slice(1) %>%
+  pull(variant.id)
+index_variant
+```
+
+
+## Sample size
+
+```{r}
+other_variant_ids <- variant_info$variant.id[2:1001]
+bm <- microbenchmark(
+  "10" = compute_ld_index(gds, index_variant, other_variant_ids, sample_include = sample_ids[1:10]),
+  "50" = compute_ld_index(gds, index_variant, other_variant_ids, sample_include = sample_ids[1:50]),
+  "100" = compute_ld_index(gds, index_variant, other_variant_ids, sample_include = sample_ids[1:100]),
+  "500" = compute_ld_index(gds, index_variant, other_variant_ids, sample_include = sample_ids[1:500]),
+  "1000" = compute_ld_index(gds, index_variant, other_variant_ids, sample_include = sample_ids[1:1000]),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  n_samples = as.integer(as.character(bm$expr)),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = n_samples, y = time, group = n_samples)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+summary(bm) %>%
+  kable()
+```
+
+## Number of variants
+
+```{r}
+bm <- microbenchmark(
+  "10" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:11], sample_include = sample_ids[1:1000]),
+  "50" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:51], sample_include = sample_ids[1:1000]),
+  "100" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:101], sample_include = sample_ids[1:1000]),
+  "500" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:501], sample_include = sample_ids[1:1000]),
+  "1000" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:1001], sample_include = sample_ids[1:1000]),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  n_variants = as.integer(as.character(bm$expr)),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = n_variants, y = time, group = n_variants)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+summary(bm) %>%
+  kable()
+```
+
+# Set of variants
+
+
+## Sample size
+
+```{r}
+variant_include <- variant_info$variant.id[1:1000]
+bm <- microbenchmark(
+  "10" = compute_ld_set(gds, variant_include, sample_include = sample_ids[1:10]),
+  "50" = compute_ld_set(gds, variant_include, sample_include = sample_ids[1:50]),
+  "100" = compute_ld_set(gds, variant_include, sample_include = sample_ids[1:100]),
+  "500" = compute_ld_set(gds, variant_include, sample_include = sample_ids[1:500]),
+  "1000" = compute_ld_set(gds, variant_include, sample_include = sample_ids[1:1000]),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  n_samples = as.integer(as.character(bm$expr)),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = n_samples, y = time, group = n_samples)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+summary(bm) %>%
+  kable()
+```
+
+## Number of variants
+
+```{r}
+set.seed(123)
+sample_ids <- seqGetData(gds, "sample.id")[1:1000]
+
+bm <- microbenchmark(
+  "10" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:10], sample_include = sample_ids[1:1000]),
+  "50" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:50], sample_include = sample_ids[1:1000]),
+  "100" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:100], sample_include = sample_ids[1:1000]),
+  "500" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:500], sample_include = sample_ids[1:1000]),
+  "1000" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:1000], sample_include = sample_ids[1:1000]),
+  unit=UNIT
+)
+bm_dat <- tibble(
+  n_variants = as.integer(as.character(bm$expr)),
+  time = bm$time / 1e9 # reported in nanoseconds by microbenchmark
+)
+ggplot(bm_dat, aes(x = n_variants, y = time, group = n_variants)) +
+  geom_boxplot()  +
+  stat_summary(fun = "median", color = "red")
+summary(bm) %>%
+  kable()
+```
+
+# Cleanup
+
+```{r}
+seqClose(gds)
+```
