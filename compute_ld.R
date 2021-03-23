@@ -1,11 +1,10 @@
 # Calculate LD for a set of variants
-sessionInfo()
-.libPaths()
-
 library(argparser)
 library(magrittr)
 library(SeqArray)
 library(LDcompute)
+
+sessionInfo()
 
 argp <- arg_parser("Calculate LD") %>%
   add_argument("gds", help = "path to the GDS file") %>%
