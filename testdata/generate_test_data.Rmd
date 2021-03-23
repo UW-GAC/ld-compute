@@ -1,0 +1,97 @@
+---
+title: Generate test data for ld-compute repository
+author: "Adrienne Stilp"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    keep_md: true 
+---
+
+```{r knitr-setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width=120)
+```
+
+```{r library-setup, message = FALSE, echo=FALSE}
+library(dplyr)
+library(SeqVarTools)
+gds <- seqOpen("1KG_phase3_subset.gds")
+```
+
+# Sample include file
+
+```{r}
+set.seed(123)
+sample_include <- sample(seqGetData(gds, "sample.id"), 1000)
+saveRDS(sample_include, file = "sample_include.rds")
+```
+
+# Variant include
+
+Choose some variants that are mono-morphic and some that are not.
+
+```{r}
+seqSetFilter(gds, sample.id=sample_include)
+variant_info <- variantInfo(gds) %>%
+  # Add some more info
+  mutate(n_alleles = nAlleles(gds),
+  af = alleleFrequency(gds),
+  maf = pmin(af, 1 - af)
+) %>%
+  # biallelic only.
+  filter(n_alleles == 2)
+```
+
+## Pair of variants
+
+```{r}
+set.seed(123)
+pair <- variant_info %>%
+  filter(maf > 0.2) %>%
+  # same chromosome
+  filter(chr == 1) %>%
+  sample_n(2)
+variant_include_1 <- pair$variant.id[1]
+variant_include_2 <- pair$variant.id[2]
+saveRDS(variant_include_1, "variant_include_pair_1.rds")
+saveRDS(variant_include_2, "variant_include_pair_2.rds")
+```
+
+## Index variant
+
+```{r}
+set.seed(123)
+index_variant <- variant_info %>%
+  filter(maf > 0.2) %>%
+  sample_n(1)
+index_variant
+
+# Select other variants within 500 kb of this variant
+other_variants <- variant_info %>%
+  filter(chr == index_variant$chr) %>%
+  filter(abs(pos - index_variant$pos) < 500e3)
+other_variants
+
+variant_include_1 <- index_variant$variant.id
+variant_include_2 <- other_variants$variant.id
+saveRDS(variant_include_1, "variant_include_index_1.rds")
+saveRDS(variant_include_2, "variant_include_index_2.rds")
+```
+
+## Set of variants
+
+Use the variants that were selected for the "index variant" case.
+
+```{r}
+variant_include <- sort(c(variant_include_1, variant_include_2))
+variant_include
+saveRDS(variant_include, "variant_include_set_1.rds")
+```
+
+# Clean up
+
+```{r}
+seqClose(gds)
+```
