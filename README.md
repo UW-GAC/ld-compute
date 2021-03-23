@@ -1,6 +1,7 @@
 # README
 
-Skeleton README for ld-compute repository.
+This repository contains an R package, `LDcompute` to compute LD using SNPRelate functions and return results in a consistent format.
+It also includes an example wrapper script (`compute_ld.R`) and test data (`testdata/`) to show how it can be used.
 
 ## Running compute_ld.R with test data
 
