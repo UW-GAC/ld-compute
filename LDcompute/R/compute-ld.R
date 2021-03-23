@@ -31,7 +31,7 @@
 #' compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
 #'
 #' # Different sample set
-#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
 #' compute_ld_pair(gds, 1, 2, methods = "composite", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
@@ -110,7 +110,7 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #' compute_ld_set(gds, c(1, 2, 3), methods = c("composite", "dprime"))
 #'
 #' # Different sample set
-#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
 #' compute_ld_set(gds, c(1, 2, 3), methods = "composite", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
@@ -183,7 +183,7 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #' compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
 #'
 #' # Different sample set
-#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
 #' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)

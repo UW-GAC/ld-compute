@@ -55,7 +55,7 @@ compute_ld_index(gds, 5, c(2:4, 6:8), methods = "dprime")
 compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
 
 # Different sample set
-sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
 compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
 
 SeqArray::seqClose(gds)

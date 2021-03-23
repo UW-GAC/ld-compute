@@ -52,7 +52,7 @@ compute_ld_set(gds, c(1, 2, 3), methods = "dprime")
 compute_ld_set(gds, c(1, 2, 3), methods = c("composite", "dprime"))
 
 # Different sample set
-sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
 compute_ld_set(gds, c(1, 2, 3), methods = "composite", sample_include = sample_include)
 
 SeqArray::seqClose(gds)
