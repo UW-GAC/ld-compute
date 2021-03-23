@@ -23,6 +23,8 @@
 #'
 #' @md
 #'
+#' @export
+#'
 #' @importFrom SeqArray seqSetFilter seqResetFilter
 #' @importFrom SNPRelate snpgdsLDMat
 #' @importFrom dplyr left_join %>% filter .data
@@ -85,6 +87,8 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #' Each pair of variants only has one record in the data frame.
 #'
 #' @md
+#'
+#' @export
 #'
 #' @importFrom SeqArray seqSetFilter seqResetFilter
 #' @importFrom SNPRelate snpgdsLDMat
@@ -149,6 +153,8 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #' Each pair of variants only has one record in the data frame.
 #'
 #' @md
+#'
+#' @export
 #'
 #' @importFrom SeqArray seqSetFilter seqResetFilter
 #' @importFrom SNPRelate snpgdsLDMat
