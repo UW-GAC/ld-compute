@@ -21,6 +21,21 @@
 #'
 #' Each pair of variants only has one record in the data frame.
 #'
+#' @examples
+#'
+#' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
+#'
+#' # Different methods
+#' compute_ld_pair(gds, 1, 2, methods = "composite")
+#' compute_ld_pair(gds, 1, 2, methods = "dprime")
+#' compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+#'
+#' # Different sample set
+#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+#' compute_ld_pair(gds, 1, 2, methods = "composite", sample_include = sample_include)
+#'
+#' SeqArray::seqClose(gds)
+#'
 #' @md
 #'
 #' @export
@@ -85,6 +100,21 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #'
 #' Each pair of variants only has one record in the data frame.
 #'
+#' @examples
+#'
+#' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
+#'
+#' # Different methods
+#' compute_ld_set(gds, c(1, 2, 3), methods = "composite")
+#' compute_ld_set(gds, c(1, 2, 3), methods = "dprime")
+#' compute_ld_set(gds, c(1, 2, 3), methods = c("composite", "dprime"))
+#'
+#' # Different sample set
+#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+#' compute_ld_set(gds, c(1, 2, 3), methods = "composite", sample_include = sample_include)
+#'
+#' SeqArray::seqClose(gds)
+#'
 #' @md
 #'
 #' @export
@@ -142,6 +172,21 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #'     * if `methods` contains `"r"`: `ld_r`
 #'
 #' Each pair of variants only has one record in the data frame.
+#'
+#' @examples
+#'
+#' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
+#'
+#' # Different methods
+#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite")
+#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "dprime")
+#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
+#'
+#' # Different sample set
+#' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
+#'
+#' SeqArray::seqClose(gds)
 #'
 #' @md
 #'

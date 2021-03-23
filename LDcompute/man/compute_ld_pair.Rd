@@ -45,6 +45,22 @@ Compute LD between a pair of variants
 \details{
 This function computes the LD between two variants using \code{snpgdsLDMat} using the specified methods.
 }
+\examples{
+
+gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
+
+# Different methods
+compute_ld_pair(gds, 1, 2, methods = "composite")
+compute_ld_pair(gds, 1, 2, methods = "dprime")
+compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+
+# Different sample set
+sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+compute_ld_pair(gds, 1, 2, methods = "composite", sample_include = sample_include)
+
+SeqArray::seqClose(gds)
+
+}
 \seealso{
 \itemize{
 \item \code{\link[=compute_ld_pair]{compute_ld_pair()}} computes LD between a pair of variants

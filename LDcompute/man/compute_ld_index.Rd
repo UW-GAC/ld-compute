@@ -45,6 +45,22 @@ Compute LD among one index variant and a set of other variants
 \details{
 This function computes the LD between \code{index_variant_id} and the variant ids specified in \code{other_variant_ids}.
 }
+\examples{
+
+gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
+
+# Different methods
+compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite")
+compute_ld_index(gds, 5, c(2:4, 6:8), methods = "dprime")
+compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
+
+# Different sample set
+sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:100]
+compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
+
+SeqArray::seqClose(gds)
+
+}
 \seealso{
 \itemize{
 \item \code{\link[=compute_ld_pair]{compute_ld_pair()}} computes LD between a pair of variants
