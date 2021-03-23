@@ -61,18 +61,7 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
       res_list[[method]] <- dat
     }
 
-    # This will be slow.
-    # We can probably speed it up by just adding columns to the final data frame.
-    # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
-    res <- res_list[[1]]
-    if (length(methods) > 1) {
-      for (i in 2:length(methods)) {
-        res <- res %>%
-          left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
-      }
-    }
-    res
-
+    .combine_ld_results(res_list)
 }
 
 
@@ -129,18 +118,7 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
     res_list[[method]] <- dat
   }
 
-  # This will be slow.
-  # We can probably speed it up by just adding columns to the final data frame.
-  # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
-  res <- res_list[[1]]
-  if (length(methods) > 1) {
-    for (i in 2:length(methods)) {
-      res <- res %>%
-        left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
-    }
-  }
-  res
-
+  .combine_ld_results(res_list)
 }
 
 
@@ -209,18 +187,8 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
       )
     res_list[[method]] <- dat
   }
-  # This will be slow.
-  # We can probably speed it up by just adding columns to the final data frame.
-  # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
-  res <- res_list[[1]]
-  if (length(methods) > 1) {
-    for (i in 2:length(methods)) {
-      res <- res %>%
-        left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
-    }
-  }
-  res
 
+  .combine_ld_results(res_list)
 }
 
 # Helper functions.
@@ -265,4 +233,18 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
   }
   seqResetFilter(gds, verbose = FALSE)
 
+}
+
+.combine_ld_results <- function(res_list) {
+  # This will be slow.
+  # We can probably speed it up by just adding columns to the final data frame.
+  # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
+  res <- res_list[[1]]
+  if (length(methods) > 1) {
+    for (i in 2:length(methods)) {
+      res <- res %>%
+        left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
+    }
+  }
+  res
 }
