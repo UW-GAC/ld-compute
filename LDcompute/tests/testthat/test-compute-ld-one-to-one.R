@@ -241,3 +241,22 @@ test_that("warning with multiallelic variants", {
   expect_warning(compute_ld_pair(gds, multi[1], bi[1]), "multiallelic")
   expect_warning(compute_ld_pair(gds, bi[1], multi[1]), "multiallelic")
 })
+
+test_that("same results as other ld functions for same variants", {
+  gds <- local_gds()
+  ld <- compute_ld_pair(gds, 1, 2)
+  expect_equal(ld, compute_ld_index(gds, 1, 2))
+  expect_equal(ld, compute_ld_set(gds, c(1, 2)))
+})
+
+test_that("checks variant input", {
+  gds <- local_gds()
+  var1 <- c(1, 2)
+  var2 <- 3
+  # Multple ids
+  expect_error(compute_ld_pair(gds, c(1, 2), 3), "only one variant.id")
+  expect_error(compute_ld_pair(gds, 3, c(1, 2)), "only one variant.id")
+  # same id
+  expect_error(compute_ld_pair(gds, 1, 1), "different variant.ids")
+  expect_error(compute_ld_pair(gds, 1, c(1, 1)), "only one variant.id")
+})

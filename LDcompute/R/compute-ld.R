@@ -38,6 +38,16 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
     # Checks - to be written.
     .check_ld_methods(methods)
 
+    # Check variant include
+    if (length(variant_id_1) != 1) {
+      stop("variant_id_1 must contain only one variant.id.")
+    }
+    if (length(variant_id_2) != 1) {
+      stop("variant_id_1 must contain only one variant.id.")
+    }
+    if (variant_id_1 == variant_id_2) {
+      stop("variant_id_1 and variant_id_2 must contain different variant.ids.")
+    }
     variant_include <- unique(c(variant_id_1, variant_id_2))
 
     .check_ld_multiallelic(gds, variant_include)
@@ -105,6 +115,9 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 
   # Handle duplicated variants.
   variant_include <- unique(variant_include)
+  if (length(variant_include) == 1) {
+    stop("variant_include must have more than one variant.id.")
+  }
 
   .check_ld_multiallelic(gds, variant_include)
 
@@ -169,6 +182,18 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
   # Checks - to be written.
   .check_ld_methods(methods)
 
+  # Check variant include
+  if (length(index_variant_id) != 1) {
+    stop("index_variant_id must contain only one variant.id.")
+  }
+  if (length(other_variant_ids) == 0) {
+    stop("other_variant_ids must contain at least one variant.id.")
+  }
+  other_variant_ids <- unique(other_variant_ids)
+  if (length(other_variant_ids) == 1 && index_variant_id == other_variant_ids) {
+    # Same variant id passed for both index_variant_id and other_variant_ids
+    stop("variant_id_1 and other_variant_ids must contain different variant.ids.")
+  }
   variant_include <- unique(c(index_variant_id, other_variant_ids))
 
   .check_ld_multiallelic(gds, variant_include)
