@@ -1,2 +1,3 @@
-# ldcompute 0.0.0.9000
+# ldcompute 0.0.1
 
+* First release of package
