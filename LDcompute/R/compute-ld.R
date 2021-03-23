@@ -235,15 +235,18 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
 
 }
 
+# Combine results from multiple LD methods into one data frame.
 .combine_ld_results <- function(res_list) {
-  # This will be slow.
-  # We can probably speed it up by just adding columns to the final data frame.
-  # Need to check that variant.id.1 and variant.id.2 are the same from all methods.
   res <- res_list[[1]]
-  if (length(methods) > 1) {
-    for (i in 2:length(methods)) {
-      res <- res %>%
-        left_join(res_list[[i]], by = c("variant.id.1", "variant.id.2"))
+  if (length(res_list) > 1) {
+    for (i in 2:length(res_list)) {
+      if (all(res$variant.id.1 == res_list[[i]]$variant.id.1) &
+          all(res$variant.id.2 == res_list[[i]]$variant.id.2)) {
+        col <- names(res_list[[i]])[3]
+        res[[col]] <- res_list[[i]][[col]]
+      } else {
+        stop("unexpected error")
+      }
     }
   }
   res
