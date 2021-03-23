@@ -50,3 +50,5 @@ po/*~
 renv/
 renv.lock
 .Rprofile
+
+*.html
