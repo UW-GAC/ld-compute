@@ -275,3 +275,18 @@ test_that("warning with multiallelic variants", {
   expect_warning(compute_ld_index(gds, bi[1], c(bi[2], multi[1])), "multiallelic")
   expect_warning(compute_ld_index(gds, multi[1], c(bi[1], multi[2])), "multiallelic")
 })
+
+test_that("same results as other ld functions for same variants", {
+  gds <- local_gds()
+  ld <- compute_ld_index(gds, 1, 2)
+  expect_equal(ld, compute_ld_pair(gds, 1, 2))
+  expect_equal(ld, compute_ld_set(gds, c(1, 2)))
+})
+
+test_that("checks variant input", {
+  gds <- local_gds()
+  # multiple variant ids for index variant
+  expect_error(compute_ld_index(gds, c(1,2), c(3,4)), "only one variant.id")
+  # same variant ids
+  expect_error(compute_ld_index(gds, 1, 1), "different variant.ids")
+})
