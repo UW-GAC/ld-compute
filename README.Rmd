@@ -30,38 +30,43 @@ Open the gds file:
 gds <- seqOpen("testdata/1KG_phase3_subset.gds")
 ```
 
+Choose the sample set:
+```{r}
+sample_include <- seqGetData(gds, "sample.id")[1:500]
+```
+
 ### LD between a pair of variants
 
 ```{r}
-compute_ld_pair(gds, 1, 2)
+compute_ld_pair(gds, 1, 2, sample_include = sample_include)
 ```
 
 Using other methods:
 ```{r}
-compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+compute_ld_pair(gds, 1, 2, sample_include = sample_include, methods = c("composite", "dprime"))
 ```
 
 ### LD between an index variant and a set of other variants
 
 ```{r}
-compute_ld_index(gds, 1, c(2:10))
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include)
 ```
 
 Using other methods:
 ```{r}
-compute_ld_index(gds, 1, c(2:10), methods = c("composite", "dprime"))
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, methods = c("composite", "dprime"))
 ```
 
 ### LD between all pairs in a set of variants
 
 
 ```{r}
-compute_ld_set(gds, c(1:10))
+compute_ld_set(gds, c(1:4), sample_include = sample_include)
 ```
 
 Using other methods:
 ```{r}
-compute_ld_set(gds, c(1:4), methods = c("composite", "dprime"))
+compute_ld_set(gds, c(1:4), sample_include = sample_include, methods = c("composite", "dprime"))
 ```
 
 ## Cleanup

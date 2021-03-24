@@ -18,90 +18,89 @@ Open the gds file:
 
     gds <- seqOpen("testdata/1KG_phase3_subset.gds")
 
+Choose the sample set:
+
+    sample_include <- seqGetData(gds, "sample.id")[1:500]
+
 ### LD between a pair of variants
 
-    compute_ld_pair(gds, 1, 2)
+    compute_ld_pair(gds, 1, 2, sample_include = sample_include)
 
     ## # A tibble: 1 x 3
     ##   variant.id.1 variant.id.2 ld_composite
     ##          <int>        <int>        <dbl>
-    ## 1            1            2      -0.0286
+    ## 1            1            2      -0.0259
 
 Using other methods:
 
-    compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+    compute_ld_pair(gds, 1, 2, sample_include = sample_include, methods = c("composite", "dprime"))
 
     ## # A tibble: 1 x 4
     ##   variant.id.1 variant.id.2 ld_composite ld_dprime
     ##          <int>        <int>        <dbl>     <dbl>
-    ## 1            1            2      -0.0286      1.00
+    ## 1            1            2      -0.0259      1.00
 
 ### LD between an index variant and a set of other variants
 
-    compute_ld_index(gds, 1, c(2:10))
+    compute_ld_index(gds, 1, c(2:10), sample_include = sample_include)
 
     ## # A tibble: 9 x 3
     ##   variant.id.1 variant.id.2 ld_composite
     ##          <int>        <int>        <dbl>
-    ## 1            1            2     -0.0286 
-    ## 2            1            3     -0.00268
-    ## 3            1            4     -0.00379
-    ## 4            1            5     -0.0108 
-    ## 5            1            6     -0.00599
-    ## 6            1            7     -0.00268
-    ## 7            1            8     -0.00464
-    ## 8            1            9      0.0414 
-    ## 9            1           10     -0.0255
+    ## 1            1            2     -0.0259 
+    ## 2            1            3     -0.00402
+    ## 3            1            4    NaN      
+    ## 4            1            5     -0.0141 
+    ## 5            1            6     -0.00569
+    ## 6            1            7    NaN      
+    ## 7            1            8    NaN      
+    ## 8            1            9     -0.0135 
+    ## 9            1           10     -0.0215
 
 Using other methods:
 
-    compute_ld_index(gds, 1, c(2:10), methods = c("composite", "dprime"))
+    compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, methods = c("composite", "dprime"))
 
     ## # A tibble: 9 x 4
     ##   variant.id.1 variant.id.2 ld_composite ld_dprime
     ##          <int>        <int>        <dbl>     <dbl>
-    ## 1            1            2     -0.0286     1.00  
-    ## 2            1            3     -0.00268    1.    
-    ## 3            1            4     -0.00379    1.    
-    ## 4            1            5     -0.0108     1.00  
-    ## 5            1            6     -0.00599    1.    
-    ## 6            1            7     -0.00268    1.    
-    ## 7            1            8     -0.00464    1.00  
-    ## 8            1            9      0.0414     0.0829
-    ## 9            1           10     -0.0255     1.
+    ## 1            1            2     -0.0259       1.00
+    ## 2            1            3     -0.00402      1.  
+    ## 3            1            4    NaN          NaN   
+    ## 4            1            5     -0.0141       1.  
+    ## 5            1            6     -0.00569      1.  
+    ## 6            1            7    NaN          NaN   
+    ## 7            1            8    NaN          NaN   
+    ## 8            1            9     -0.0135       1.  
+    ## 9            1           10     -0.0215       1.
 
 ### LD between all pairs in a set of variants
 
-    compute_ld_set(gds, c(1:10))
+    compute_ld_set(gds, c(1:4), sample_include = sample_include)
 
-    ## # A tibble: 45 x 3
-    ##    variant.id.1 variant.id.2 ld_composite
-    ##           <int>        <int>        <dbl>
-    ##  1            1            2     -0.0286 
-    ##  2            1            3     -0.00268
-    ##  3            1            4     -0.00379
-    ##  4            1            5     -0.0108 
-    ##  5            1            6     -0.00599
-    ##  6            1            7     -0.00268
-    ##  7            1            8     -0.00464
-    ##  8            1            9      0.0414 
-    ##  9            1           10     -0.0255 
-    ## 10            2            3     -0.00949
-    ## # … with 35 more rows
+    ## # A tibble: 6 x 3
+    ##   variant.id.1 variant.id.2 ld_composite
+    ##          <int>        <int>        <dbl>
+    ## 1            1            2     -0.0259 
+    ## 2            1            3     -0.00402
+    ## 3            1            4    NaN      
+    ## 4            2            3     -0.0129 
+    ## 5            2            4    NaN      
+    ## 6            3            4    NaN
 
 Using other methods:
 
-    compute_ld_set(gds, c(1:4), methods = c("composite", "dprime"))
+    compute_ld_set(gds, c(1:4), sample_include = sample_include, methods = c("composite", "dprime"))
 
     ## # A tibble: 6 x 4
     ##   variant.id.1 variant.id.2 ld_composite ld_dprime
     ##          <int>        <int>        <dbl>     <dbl>
-    ## 1            1            2     -0.0286      1.00 
-    ## 2            1            3     -0.00268     1.   
-    ## 3            1            4     -0.00379     1.   
-    ## 4            2            3     -0.00949     1.   
-    ## 5            2            4      0.0547      0.446
-    ## 6            3            4     -0.00126     1.00
+    ## 1            1            2     -0.0259       1.00
+    ## 2            1            3     -0.00402      1.  
+    ## 3            1            4    NaN          NaN   
+    ## 4            2            3     -0.0129       1.00
+    ## 5            2            4    NaN          NaN   
+    ## 6            3            4    NaN          NaN
 
 ## Cleanup
 
