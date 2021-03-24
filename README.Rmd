@@ -1,0 +1,116 @@
+---
+output:
+  github_document
+---
+
+# README
+
+This repository contains an R package, `LDcompute` to compute LD using SNPRelate functions and return results in a consistent format.
+It also includes an example wrapper script (`compute_ld.R`) and test data (`testdata/`) to show how it can be used.
+
+## Calling functions directly
+
+Load other packages.
+```{r}
+library(SeqArray)
+```
+
+Load the `LDcompute` package.
+
+```{r, echo = FALSE, include = TRUE}
+library(LDcompute)
+```
+```{r, echo = TRUE, include = FALSE}
+devtools::load_all("LDcompute")
+```
+
+Open the gds file:
+
+```{r}
+gds <- seqOpen("testdata/1KG_phase3_subset.gds")
+```
+
+Choose the sample set:
+```{r}
+sample_include <- seqGetData(gds, "sample.id")[1:500]
+```
+
+### LD between a pair of variants
+
+```{r}
+compute_ld_pair(gds, 1, 2, sample_include = sample_include)
+```
+
+Using other methods:
+```{r}
+compute_ld_pair(gds, 1, 2, sample_include = sample_include, methods = c("composite", "dprime"))
+```
+
+### LD between an index variant and a set of other variants
+
+```{r}
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include)
+```
+
+Using other methods:
+```{r}
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, methods = c("composite", "dprime"))
+```
+
+### LD between all pairs in a set of variants
+
+
+```{r}
+compute_ld_set(gds, c(1:4), sample_include = sample_include)
+```
+
+Using other methods:
+```{r}
+compute_ld_set(gds, c(1:4), sample_include = sample_include, methods = c("composite", "dprime"))
+```
+
+## Cleanup
+
+```{r}
+seqClose(gds)
+```
+
+## Running compute_ld.R with test data
+
+### LD between a pair of variants
+
+```
+R --no-save --args \
+  testdata/1KG_phase3_subset.gds \
+  --methods composite dprime \
+  --variant_include_file_1 testdata/variant_include_pair_1.rds \
+  --variant_include_file_2 testdata/variant_include_pair_2.rds \
+  --sample_include_file testdata/sample_include.rds \
+  --outfile ld_pair.rds \
+  < compute_ld.R
+```
+
+### LD between an index variant and a set of other variants
+
+```
+R --no-save --args \
+  testdata/1KG_phase3_subset.gds \
+  --methods composite dprime \
+  --variant_include_file_1 testdata/variant_include_index_1.rds \
+  --variant_include_file_2 testdata/variant_include_index_2.rds \
+  --sample_include_file testdata/sample_include.rds \
+  --outfile ld_index.rds \
+  < compute_ld.R
+```
+
+### LD between all pairs in a set of variants
+
+```
+R --no-save --args \
+  testdata/1KG_phase3_subset.gds \
+  --methods composite dprime \
+  --variant_include_file_1 testdata/variant_include_set_1.rds \
+  --sample_include_file testdata/sample_include.rds \
+  --outfile ld_set.rds \
+  < compute_ld.R
+```
