@@ -3,11 +3,14 @@
 #' @param gds A SeqArray GDS file
 #' @param variant_id_1 First variant id in the pair
 #' @param variant_id_2 Second variant id in the pair
-#' @param ld_methods Character vector of methods to use to calculate LD. Can be any of `"composite"`, `"corr"`, `"r"`, `"dprime"`.
+#' @param ld_methods Character vector of methods to use to calculate LD. Can be any of ``"r2"`, `"r"`, `"dprime"`. See details.
 #' @param sample_include A vector of sample.ids to use for LD calculation.
 #'
 #' @details
 #' This function computes the LD between two variants using \code{snpgdsLDMat} using the specified methods.
+#' The `r2` method runs the `SNPRelate` `corr` method and squares the result.
+#' The `r` method runs the `SNPRelate` `corr` method but does not square the result.
+#' The `dprime` method runs the `SNPRelate` `dprime` method.
 #'
 #' @return
 #' A data frame with the following columns:
@@ -26,13 +29,13 @@
 #' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 #'
 #' # Different methods
-#' compute_ld_pair(gds, 1, 2, methods = "composite")
-#' compute_ld_pair(gds, 1, 2, methods = "dprime")
-#' compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+#' compute_ld_pair(gds, 1, 2)
+#' compute_ld_pair(gds, 1, 2, ld_methods = "dprime")
+#' compute_ld_pair(gds, 1, 2, ld_methods = c("r2", "dprime"))
 #'
 #' # Different sample set
 #' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-#' compute_ld_pair(gds, 1, 2, methods = "composite", sample_include = sample_include)
+#' compute_ld_pair(gds, 1, 2, ld_methods = "r2", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
 #'
@@ -87,6 +90,9 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2",
 #'
 #' @details
 #' This function computes the LD between all pairs in a set of variants using \code{snpgdsLDMat} using the specified methods.
+#' The `r2` method runs the `SNPRelate` `corr` method and squares the result.
+#' The `r` method runs the `SNPRelate` `corr` method but does not square the result.
+#' The `dprime` method runs the `SNPRelate` `dprime` method.
 #'
 #' @return
 #' A data frame with the following columns:
@@ -105,13 +111,13 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2",
 #' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 #'
 #' # Different methods
-#' compute_ld_set(gds, c(1, 2, 3), methods = "composite")
-#' compute_ld_set(gds, c(1, 2, 3), methods = "dprime")
-#' compute_ld_set(gds, c(1, 2, 3), methods = c("composite", "dprime"))
+#' compute_ld_set(gds, c(1, 2, 3))
+#' compute_ld_set(gds, c(1, 2, 3), ld_methods = "dprime")
+#' compute_ld_set(gds, c(1, 2, 3), ld_methods = c("r2", "dprime"))
 #'
 #' # Different sample set
 #' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-#' compute_ld_set(gds, c(1, 2, 3), methods = "composite", sample_include = sample_include)
+#' compute_ld_set(gds, c(1, 2, 3), ld_methods = "r2", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
 #'
@@ -160,6 +166,9 @@ compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_inclu
 #'
 #' @details
 #' This function computes the LD between `index_variant_id` and the variant ids specified in `other_variant_ids`.
+#' The `r2` method runs the `SNPRelate` `corr` method and squares the result.
+#' The `r` method runs the `SNPRelate` `corr` method but does not square the result.
+#' The `dprime` method runs the `SNPRelate` `dprime` method.
 #'
 #' @return
 #' A data frame with the following columns:
@@ -178,13 +187,13 @@ compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_inclu
 #' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 #'
 #' # Different methods
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite")
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "dprime")
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
+#' compute_ld_index(gds, 5, c(2:4, 6:8))
+#' compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = "dprime")
+#' compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = c("r2", "dprime"))
 #'
 #' # Different sample set
 #' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
+#' compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = "r2", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
 #'

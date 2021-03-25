@@ -8,7 +8,7 @@ compute_ld_index(
   gds,
   index_variant_id,
   other_variant_ids,
-  methods = "composite",
+  ld_methods = "r2",
   sample_include = NULL
 )
 }
@@ -19,7 +19,7 @@ compute_ld_index(
 
 \item{other_variant_ids}{A vector of variant ids to calculate LD with the \code{index_variant_id}}
 
-\item{methods}{Character vector of methods to use to calculate LD. Can be any of \code{"composite"}, \code{"corr"}, \code{"r"}, \code{"dprime"}.}
+\item{ld_methods}{Character vector of methods to use to calculate LD. Can be any of ``"r2"\verb{, }"r"`, `"dprime"`. See details.}
 
 \item{sample_include}{A vector of sample.ids to use for LD calculation.}
 }
@@ -44,19 +44,22 @@ Compute LD among one index variant and a set of other variants
 }
 \details{
 This function computes the LD between \code{index_variant_id} and the variant ids specified in \code{other_variant_ids}.
+The \code{r2} method runs the \code{SNPRelate} \code{corr} method and squares the result.
+The \code{r} method runs the \code{SNPRelate} \code{corr} method but does not square the result.
+The \code{dprime} method runs the \code{SNPRelate} \code{dprime} method.
 }
 \examples{
 
 gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 
 # Different methods
-compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite")
-compute_ld_index(gds, 5, c(2:4, 6:8), methods = "dprime")
-compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
+compute_ld_index(gds, 5, c(2:4, 6:8))
+compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = "dprime")
+compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = c("r2", "dprime"))
 
 # Different sample set
 sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
+compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = "r2", sample_include = sample_include)
 
 SeqArray::seqClose(gds)
 

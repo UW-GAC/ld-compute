@@ -8,7 +8,7 @@ compute_ld_pair(
   gds,
   variant_id_1,
   variant_id_2,
-  methods = "composite",
+  ld_methods = "r2",
   sample_include = NULL
 )
 }
@@ -19,7 +19,7 @@ compute_ld_pair(
 
 \item{variant_id_2}{Second variant id in the pair}
 
-\item{methods}{Character vector of methods to use to calculate LD. Can be any of \code{"composite"}, \code{"corr"}, \code{"r"}, \code{"dprime"}.}
+\item{ld_methods}{Character vector of methods to use to calculate LD. Can be any of ``"r2"\verb{, }"r"`, `"dprime"`. See details.}
 
 \item{sample_include}{A vector of sample.ids to use for LD calculation.}
 }
@@ -44,19 +44,22 @@ Compute LD between a pair of variants
 }
 \details{
 This function computes the LD between two variants using \code{snpgdsLDMat} using the specified methods.
+The \code{r2} method runs the \code{SNPRelate} \code{corr} method and squares the result.
+The \code{r} method runs the \code{SNPRelate} \code{corr} method but does not square the result.
+The \code{dprime} method runs the \code{SNPRelate} \code{dprime} method.
 }
 \examples{
 
 gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 
 # Different methods
-compute_ld_pair(gds, 1, 2, methods = "composite")
-compute_ld_pair(gds, 1, 2, methods = "dprime")
-compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+compute_ld_pair(gds, 1, 2)
+compute_ld_pair(gds, 1, 2, ld_methods = "dprime")
+compute_ld_pair(gds, 1, 2, ld_methods = c("r2", "dprime"))
 
 # Different sample set
 sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-compute_ld_pair(gds, 1, 2, methods = "composite", sample_include = sample_include)
+compute_ld_pair(gds, 1, 2, ld_methods = "r2", sample_include = sample_include)
 
 SeqArray::seqClose(gds)
 
