@@ -7,15 +7,15 @@ test_that("works normally", {
   var2 <- 2
   ld <- compute_ld_pair(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_composite, chk$LD[1,2])
+  expect_equal(ld$ld_r2, chk$LD[1,2]^2)
 })
 
 test_that("returns ids in the correct order", {
@@ -24,15 +24,15 @@ test_that("returns ids in the correct order", {
   var2 <- 1
   ld <- compute_ld_pair(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_composite, chk$LD[1,2])
+  expect_equal(ld$ld_r2, chk$LD[1,2]^2)
 })
 
 test_that("returns variant ids in correct order with 2 and 10", {
@@ -41,15 +41,15 @@ test_that("returns variant ids in correct order with 2 and 10", {
   var2 <- 10
   ld <- compute_ld_pair(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_composite, chk$LD[1,2])
+  expect_equal(ld$ld_r2, chk$LD[1,2]^2)
 })
 
 test_that("missing data", {
@@ -60,12 +60,12 @@ test_that("missing data", {
 
   ld <- compute_ld_pair(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
-  expect_true(!is.na(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
+  expect_true(!is.na(ld$ld_r2))
 })
 
 test_that("multiallelic variants", {
@@ -76,12 +76,12 @@ test_that("multiallelic variants", {
 
   expect_warning(ld <- compute_ld_pair(gds, var1, var2), "multiallelic")
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
-  expect_true(!is.na(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
+  expect_true(!is.na(ld$ld_r2))
 })
 
 test_that("different methods", {
@@ -90,15 +90,23 @@ test_that("different methods", {
   var1 <- 1
   var2 <- 2
 
-  ld <- compute_ld_pair(gds, var1, var2, methods = "composite")
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  ld <- compute_ld_pair(gds, var1, var2, ld_methods = "r2")
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "composite", slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_composite, chk$LD[1,2])
+  chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "corr", slide = -1, verbose = FALSE)
+  expect_equal(ld$ld_r2, chk$LD[1,2]^2)
 
-  ld <- compute_ld_pair(gds, var1, var2, methods = "dprime")
+  ld <- compute_ld_pair(gds, var1, var2, ld_methods = "r")
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r"))
+  expect_equal(nrow(ld), 1)
+  expect_equal(ld$variant.id.1, var1)
+  expect_equal(ld$variant.id.2, var2)
+  chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "corr", slide = -1, verbose = FALSE)
+  expect_equal(ld$ld_r, chk$LD[1,2])
+
+  ld <- compute_ld_pair(gds, var1, var2, ld_methods = "dprime")
   expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_dprime"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
@@ -106,24 +114,11 @@ test_that("different methods", {
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "dprime", slide = -1, verbose = FALSE)
   expect_equal(ld$ld_dprime, chk$LD[1,2])
 
-  ld <- compute_ld_pair(gds, var1, var2, method = "corr")
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_corr"))
-  expect_equal(nrow(ld), 1)
-  expect_equal(ld$variant.id.1, var1)
-  expect_equal(ld$variant.id.2, var2)
-  chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "corr", slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_corr, chk$LD[1,2])
-
-  ld <- compute_ld_pair(gds, var1, var2, method = "r")
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r"))
-  expect_equal(nrow(ld), 1)
-  expect_equal(ld$variant.id.1, var1)
-  expect_equal(ld$variant.id.2, var2)
-  chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), method = "r", slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_r, chk$LD[1,2])
 
   # Method not allowed.
-  expect_error(compute_ld_pair(gds, var1, var2, method = "foo"), "allowed methods")
+  expect_error(compute_ld_pair(gds, var1, var2, ld_methods = "foo"), "allowed methods")
+  expect_error(compute_ld_pair(gds, var1, var2, ld_methods = "corr"), "allowed methods")
+  expect_error(compute_ld_pair(gds, var1, var2, ld_methods = "composite"), "allowed methods")
 
 })
 
@@ -133,23 +128,21 @@ test_that("multiple methods are allowed", {
   var1 <- 1
   var2 <- 2
 
-  ld_composite <- compute_ld_pair(gds, var1, var2, methods = "composite")
-  ld_dprime <- compute_ld_pair(gds, var1, var2, methods = "dprime")
-  ld_corr <- compute_ld_pair(gds, var1, var2, method = "corr")
-  ld_r <- compute_ld_pair(gds, var1, var2, method = "r")
+  ld_r2 <- compute_ld_pair(gds, var1, var2, ld_methods = "r2")
+  ld_r <- compute_ld_pair(gds, var1, var2, ld_methods = "r")
+  ld_dprime <- compute_ld_pair(gds, var1, var2, ld_methods = "dprime")
 
-  ld_full <- compute_ld_pair(gds, var1, var2, methods = c("composite", "dprime", "corr", "r"))
-  expect_equal(names(ld_full), c("variant.id.1", "variant.id.2", "ld_composite", "ld_dprime", "ld_corr", "ld_r"))
+  ld_full <- compute_ld_pair(gds, var1, var2, ld_methods = c("r2", "r", "dprime"))
+  expect_equal(names(ld_full), c("variant.id.1", "variant.id.2", "ld_r2", "ld_r", "ld_dprime"))
   expect_equal(ld_full$variant.id.1, var1)
   expect_equal(ld_full$variant.id.2, var2)
-  expect_equal(ld_full$ld_composite, ld_composite$ld_composite)
+  expect_equal(ld_full$ld_r2, ld_r2$ld_r2)
   expect_equal(ld_full$ld_dprime, ld_dprime$ld_dprime)
-  expect_equal(ld_full$ld_corr, ld_corr$ld_corr)
   expect_equal(ld_full$ld_r, ld_r$ld_r)
 
 
   # Method not allowed.
-  expect_error(compute_ld_pair(gds, var1, var2, method = c("r", "foo")), "allowed methods")
+  expect_error(compute_ld_pair(gds, var1, var2, ld_methods = c("r", "foo")), "allowed methods")
  })
 
 test_that("different chromosomes", {
@@ -160,15 +153,15 @@ test_that("different chromosomes", {
   var2 <- variant_ids[chr == 2][1]
   ld <- compute_ld_index(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)
-  expect_equal(ld$ld_composite, chk$LD[1,2])
+  expect_equal(ld$ld_r2, chk$LD[1,2]^2)
 })
 
 test_that("sample set", {
@@ -180,18 +173,18 @@ test_that("sample set", {
   ld_all <- compute_ld_pair(gds, var1, var2)
   ld_sub <- compute_ld_pair(gds, var1, var2, sample_include = sample_include)
 
-  expect_equal(names(ld_sub), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld_sub), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld_sub), 1)
   expect_equal(ld_sub$variant.id.1, var1)
   expect_equal(ld_sub$variant.id.2, var2)
-  expect_true(is.numeric(ld_sub$ld_composite))
+  expect_true(is.numeric(ld_sub$ld_r2))
 
   # Different than with all samples together.
-  expect_true(ld_sub$ld_composite != ld_all$ld_composite)
+  expect_true(ld_sub$ld_r2 != ld_all$ld_r2)
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), sample.id=sample_include, slide = -1, verbose = FALSE)
-  expect_equal(ld_sub$ld_composite, chk$LD[1,2])
+  expect_equal(ld_sub$ld_r2, chk$LD[1,2]^2)
 })
 
 test_that("works with large variant ids", {
@@ -200,15 +193,15 @@ test_that("works with large variant ids", {
   var2 <- 10000
   ld <- compute_ld_pair(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, 1)
   expect_equal(ld$variant.id.2, 10000)
-  expect_true(is.numeric(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(1, 10000), slide = -1, verbose = FALSE)$LD
-  expect_equal(ld$ld_composite, chk[1, 2])
+  expect_equal(ld$ld_r2, chk[1, 2]^2)
 })
 
 test_that("random set of variants", {
@@ -220,15 +213,15 @@ test_that("random set of variants", {
   var2 <- sample(setdiff(variant_ids, var1), 1)
   ld <- compute_ld_pair(gds, var1, var2)
 
-  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_composite"))
+  expect_equal(names(ld), c("variant.id.1", "variant.id.2", "ld_r2"))
   expect_equal(nrow(ld), 1)
   expect_equal(ld$variant.id.1, var1)
   expect_equal(ld$variant.id.2, var2)
-  expect_true(is.numeric(ld$ld_composite))
+  expect_true(is.numeric(ld$ld_r2))
 
   # Check against the function directly.
   chk <- snpgdsLDMat(gds, snp.id = c(var1, var2), slide = -1, verbose = FALSE)$LD
-  expect_equal(ld$ld_composite, chk[1, 2])
+  expect_equal(ld$ld_r2, chk[1, 2]^2)
 })
 
 test_that("non-existing sample_include", {
