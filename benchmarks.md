@@ -1,7 +1,7 @@
 ---
 title: Time and memory benchmarks for LD calculation code
 author: "Adrienne Stilp"
-date:  "23 March, 2021"
+date:  "25 March, 2021"
 output:
   html_document:
     toc: true
@@ -88,11 +88,11 @@ summary(bm) %>%
 
 |expr |      min|       lq|     mean|   median|       uq|      max| neval|
 |:----|--------:|--------:|--------:|--------:|--------:|--------:|-----:|
-|10   | 9.796232| 9.832776| 10.43251| 9.895214| 10.08792| 14.46743|   100|
-|50   | 9.792343| 9.830352| 10.53970| 9.873261| 10.08080| 24.64018|   100|
-|100  | 9.798199| 9.847103| 11.42042| 9.949786| 10.10327| 46.69757|   100|
-|500  | 9.828184| 9.866934| 10.78646| 9.910264| 10.12513| 26.92271|   100|
-|1000 | 9.843050| 9.876798| 10.79963| 9.948108| 10.24002| 18.76662|   100|
+|10   | 10.52532| 10.61405| 10.66807| 10.65764| 10.71359| 11.01763|   100|
+|50   | 10.53113| 10.59380| 10.69426| 10.65833| 10.73153| 11.83102|   100|
+|100  | 10.52383| 10.56888| 10.71255| 10.65779| 10.69809| 16.13594|   100|
+|500  | 10.53181| 10.57622| 10.74280| 10.68145| 10.71668| 16.57766|   100|
+|1000 | 10.56252| 10.60779| 10.75292| 10.69983| 10.75587| 13.24533|   100|
 
 ## Number of variants
 
@@ -103,10 +103,9 @@ Irrelevant for `compute_ld_pair`.
 
 ```r
 bm <- microbenchmark(
-  "composite" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "composite"),
-  "dprime" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "dprime"),
-  "corr" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "corr"),
-  "r" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "r"),
+  "dprime" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="dprime"),
+  "corr" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="r2"),
+  "r" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="r"),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -119,7 +118,7 @@ ggplot(bm_dat, aes(x = method, y = time, group = method)) +
 ```
 
 ```
-## Warning: Removed 4 rows containing missing values (geom_segment).
+## Warning: Removed 3 rows containing missing values (geom_segment).
 ```
 
 ![](benchmarks_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
@@ -131,12 +130,11 @@ summary(bm) %>%
 
 
 
-|expr      |      min|       lq|     mean|    median|       uq|      max| neval|
-|:---------|--------:|--------:|--------:|---------:|--------:|--------:|-----:|
-|composite | 9.812066| 9.843392| 10.01725| 10.011476| 10.09040| 10.80986|   100|
-|dprime    | 9.812013| 9.841397| 10.06821|  9.964109| 10.14499| 13.22644|   100|
-|corr      | 9.807007| 9.838345| 10.20306|  9.973077| 10.14691| 22.99572|   100|
-|r         | 9.811377| 9.843305| 10.11210| 10.023204| 10.13406| 14.71517|   100|
+|expr   |      min|       lq|     mean|   median|       uq|      max| neval|
+|:------|--------:|--------:|--------:|--------:|--------:|--------:|-----:|
+|dprime | 10.47735| 10.51143| 10.58766| 10.52883| 10.59122| 11.72213|   100|
+|corr   | 10.56873| 10.59413| 10.74529| 10.61461| 10.68337| 16.14324|   100|
+|r      | 10.47711| 10.50188| 10.64563| 10.52788| 10.63914| 11.72040|   100|
 
 ## Number of methods
 
@@ -146,10 +144,9 @@ set.seed(123)
 sample_ids <- seqGetData(gds, "sample.id")[1:1000]
 
 bm <- microbenchmark(
-  "1" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "composite"),
-  "2" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime")),
-  "3" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime", "corr")),
-  "4" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime", "corr", "r")),
+  "1" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="r2"),
+  "2" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods =c("r2", "r")),
+  "3" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods =c("r2", "r", "dprime")),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -162,7 +159,7 @@ ggplot(bm_dat, aes(x = n_methods, y = time, group = n_methods)) +
 ```
 
 ```
-## Warning: Removed 4 rows containing missing values (geom_segment).
+## Warning: Removed 3 rows containing missing values (geom_segment).
 ```
 
 ![](benchmarks_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
@@ -176,10 +173,9 @@ summary(bm) %>%
 
 |expr |      min|       lq|     mean|   median|       uq|      max| neval|
 |:----|--------:|--------:|--------:|--------:|--------:|--------:|-----:|
-|1    | 10.10248| 10.12471| 10.42681| 10.13821| 10.16095| 23.54975|   100|
-|2    | 18.15694| 18.20163| 18.72585| 18.23004| 18.30729| 37.36471|   100|
-|3    | 26.17775| 26.22734| 26.46249| 26.26862| 26.43961| 29.49997|   100|
-|4    | 34.16300| 34.23483| 34.98618| 34.28213| 34.46125| 44.33468|   100|
+|1    | 10.57610| 10.70303| 11.02043| 10.76707| 10.87955| 16.67697|   100|
+|2    | 18.89311| 19.11280| 19.55535| 19.20557| 19.52561| 25.20497|   100|
+|3    | 27.15608| 27.49262| 28.17799| 27.65991| 27.90577| 36.07658|   100|
 
 # Index variant
 
@@ -231,13 +227,13 @@ summary(bm) %>%
 
 
 
-|expr |       min|        lq|      mean|    median|        uq|       max| neval|
-|:----|---------:|---------:|---------:|---------:|---------:|---------:|-----:|
-|10   |  114.6886|  119.9305|  158.0601|  124.0277|  134.4874|  617.7881|   100|
-|50   |  153.3306|  158.5796|  200.5213|  160.9455|  167.9288|  804.0679|   100|
-|100  |  203.6320|  208.6549|  245.6409|  211.2100|  220.3207|  835.2407|   100|
-|500  |  615.8889|  620.8656|  651.0464|  623.1024|  631.0974| 1051.9573|   100|
-|1000 | 1126.8145| 1131.7564| 1167.3301| 1134.0777| 1147.3631| 1737.5211|   100|
+|expr |      min|       lq|     mean|   median|       uq|       max| neval|
+|:----|--------:|--------:|--------:|--------:|--------:|---------:|-----:|
+|10   | 110.4157| 114.9221| 138.9031| 119.6042| 129.0897|  562.7005|   100|
+|50   | 125.2014| 129.1855| 139.5342| 130.8269| 137.3624|  648.7987|   100|
+|100  | 141.4134| 146.1762| 166.1708| 150.8383| 161.5544|  644.6663|   100|
+|500  | 283.8662| 289.4239| 312.0171| 295.0945| 302.5886|  722.0050|   100|
+|1000 | 459.3947| 466.8479| 499.5879| 477.3993| 492.8293| 1046.3241|   100|
 
 ## Number of variants
 
@@ -249,6 +245,7 @@ bm <- microbenchmark(
   "100" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:101], sample_include = sample_ids[1:1000]),
   "500" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:501], sample_include = sample_ids[1:1000]),
   "1000" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:1001], sample_include = sample_ids[1:1000]),
+  "2000" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:2001], sample_include = sample_ids[1:1000]),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -261,7 +258,7 @@ ggplot(bm_dat, aes(x = n_variants, y = time, group = n_variants)) +
 ```
 
 ```
-## Warning: Removed 5 rows containing missing values (geom_segment).
+## Warning: Removed 6 rows containing missing values (geom_segment).
 ```
 
 ![](benchmarks_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
@@ -273,13 +270,14 @@ summary(bm) %>%
 
 
 
-|expr |        min|          lq|        mean|      median|          uq|        max| neval|
-|:----|----------:|-----------:|-----------:|-----------:|-----------:|----------:|-----:|
-|10   |    7.88878|    8.003068|    8.363269|    8.186149|    8.463468|   13.79620|   100|
-|50   |   12.40109|   12.497355|   13.089845|   12.719454|   13.263302|   32.07197|   100|
-|100  |   22.44133|   22.593011|   23.029665|   22.809753|   23.300299|   27.54963|   100|
-|500  |  297.13293|  297.446166|  303.481646|  297.933074|  302.397040|  651.92159|   100|
-|1000 | 1125.80771| 1129.577305| 1152.749353| 1132.789078| 1138.805715| 1622.19789|   100|
+|expr |         min|         lq|        mean|      median|         uq|        max| neval|
+|:----|-----------:|----------:|-----------:|-----------:|----------:|----------:|-----:|
+|10   |    8.388838|    8.77740|    9.657953|    9.411273|   10.09247|   13.63362|   100|
+|50   |   11.361909|   11.85990|   12.549716|   12.326756|   12.86233|   16.23072|   100|
+|100  |   16.426368|   17.08628|   18.114068|   17.562661|   18.29774|   32.72102|   100|
+|500  |  131.347823|  132.47957|  149.122407|  135.221907|  140.60918|  679.80625|   100|
+|1000 |  459.478373|  467.96650|  515.247383|  477.189912|  503.31020| 1044.14439|   100|
+|2000 | 1745.609591| 1860.51614| 2135.320850| 2199.128644| 2308.69160| 2754.57724|   100|
 
 # Set of variants
 
@@ -319,20 +317,19 @@ summary(bm) %>%
 
 
 
-|expr |       min|        lq|      mean|    median|        uq|       max| neval|
-|:----|---------:|---------:|---------:|---------:|---------:|---------:|-----:|
-|10   |  104.1840|  104.7051|  126.9031|  109.4652|  114.6185|  541.6628|   100|
-|50   |  143.8221|  144.3135|  154.6649|  148.9978|  151.3449|  542.2774|   100|
-|100  |  193.5105|  198.1668|  224.3762|  198.7425|  205.9002|  614.7124|   100|
-|500  |  605.2735|  605.9170|  612.1582|  610.5005|  613.6306|  645.1558|   100|
-|1000 | 1115.1398| 1119.6467| 1135.5108| 1120.7930| 1128.4079| 1547.3402|   100|
+|expr |       min|       lq|     mean|   median|       uq|      max| neval|
+|:----|---------:|--------:|--------:|--------:|--------:|--------:|-----:|
+|10   |  99.00866| 101.4256| 118.4057| 105.9747| 111.4181| 639.7390|   100|
+|50   | 114.26350| 115.1583| 127.4614| 119.8944| 128.1285| 603.7246|   100|
+|100  | 130.87990| 131.8685| 156.8707| 136.6305| 142.4315| 660.6176|   100|
+|500  | 272.77804| 277.4445| 295.7624| 281.7978| 292.4052| 753.8523|   100|
+|1000 | 448.99267| 453.6685| 472.3224| 459.9931| 481.4683| 874.1749|   100|
 
 ## Number of variants
 
 
 ```r
 set.seed(123)
-sample_ids <- seqGetData(gds, "sample.id")[1:1000]
 
 bm <- microbenchmark(
   "10" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:10], sample_include = sample_ids[1:1000]),
@@ -340,6 +337,7 @@ bm <- microbenchmark(
   "100" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:100], sample_include = sample_ids[1:1000]),
   "500" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:500], sample_include = sample_ids[1:1000]),
   "1000" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:1000], sample_include = sample_ids[1:1000]),
+  "2000" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:2000], sample_include = sample_ids[1:1000]),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -352,7 +350,7 @@ ggplot(bm_dat, aes(x = n_variants, y = time, group = n_variants)) +
 ```
 
 ```
-## Warning: Removed 5 rows containing missing values (geom_segment).
+## Warning: Removed 6 rows containing missing values (geom_segment).
 ```
 
 ![](benchmarks_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
@@ -364,13 +362,14 @@ summary(bm) %>%
 
 
 
-|expr |         min|          lq|        mean|      median|          uq|        max| neval|
-|:----|-----------:|-----------:|-----------:|-----------:|-----------:|----------:|-----:|
-|10   |    7.844858|    7.997434|    8.679132|    8.188698|    8.782078|   26.52634|   100|
-|50   |   12.175595|   12.332527|   12.623446|   12.505097|   12.807135|   15.97201|   100|
-|100  |   22.220871|   22.342522|   22.893993|   22.587685|   22.946949|   35.64222|   100|
-|500  |  295.982348|  296.418730|  302.872019|  297.147205|  301.271981|  714.80352|   100|
-|1000 | 1124.329319| 1128.312332| 1149.587783| 1130.146229| 1138.209907| 1599.25296|   100|
+|expr |         min|          lq|        mean|     median|         uq|        max| neval|
+|:----|-----------:|-----------:|-----------:|----------:|----------:|----------:|-----:|
+|10   |    8.367458|    8.780274|    9.304719|    9.19499|    9.49988|   14.23363|   100|
+|50   |   11.184383|   11.607853|   12.313405|   11.98148|   12.40251|   18.31356|   100|
+|100  |   16.415881|   16.818565|   21.479383|   17.36042|   17.76981|  407.86593|   100|
+|500  |  130.968224|  132.013240|  136.558505|  133.73525|  136.61674|  210.40399|   100|
+|1000 |  459.052378|  462.110669|  479.279536|  468.05104|  477.94144|  849.21447|   100|
+|2000 | 1731.391091| 1922.909789| 2102.688719| 2154.35679| 2219.06152| 2541.41869|   100|
 
 # Cleanup
 

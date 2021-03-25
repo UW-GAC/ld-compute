@@ -84,10 +84,9 @@ Irrelevant for `compute_ld_pair`.
 
 ```{r}
 bm <- microbenchmark(
-  "composite" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "composite"),
-  "dprime" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "dprime"),
-  "corr" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "corr"),
-  "r" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "r"),
+  "dprime" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="dprime"),
+  "corr" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="r2"),
+  "r" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="r"),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -109,10 +108,9 @@ set.seed(123)
 sample_ids <- seqGetData(gds, "sample.id")[1:1000]
 
 bm <- microbenchmark(
-  "1" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = "composite"),
-  "2" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime")),
-  "3" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime", "corr")),
-  "4" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], methods = c("composite", "dprime", "corr", "r")),
+  "1" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods ="r2"),
+  "2" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods =c("r2", "r")),
+  "3" = compute_ld_pair(gds, var1, var2, sample_include = sample_ids[1:1000], ld_methods =c("r2", "r", "dprime")),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -168,6 +166,7 @@ bm <- microbenchmark(
   "100" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:101], sample_include = sample_ids[1:1000]),
   "500" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:501], sample_include = sample_ids[1:1000]),
   "1000" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:1001], sample_include = sample_ids[1:1000]),
+  "2000" = compute_ld_index(gds, index_variant, variant_info$variant.id[2:2001], sample_include = sample_ids[1:1000]),
   unit=UNIT
 )
 bm_dat <- tibble(
@@ -211,7 +210,6 @@ summary(bm) %>%
 
 ```{r}
 set.seed(123)
-sample_ids <- seqGetData(gds, "sample.id")[1:1000]
 
 bm <- microbenchmark(
   "10" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:10], sample_include = sample_ids[1:1000]),
@@ -219,6 +217,7 @@ bm <- microbenchmark(
   "100" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:100], sample_include = sample_ids[1:1000]),
   "500" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:500], sample_include = sample_ids[1:1000]),
   "1000" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:1000], sample_include = sample_ids[1:1000]),
+  "2000" = compute_ld_index(gds, index_variant, variant_info$variant.id[1:2000], sample_include = sample_ids[1:1000]),
   unit=UNIT
 )
 bm_dat <- tibble(
