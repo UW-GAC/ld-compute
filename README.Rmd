@@ -43,7 +43,7 @@ compute_ld_pair(gds, 1, 2, sample_include = sample_include)
 
 Using other methods:
 ```{r}
-compute_ld_pair(gds, 1, 2, sample_include = sample_include, methods = c("composite", "dprime"))
+compute_ld_pair(gds, 1, 2, sample_include = sample_include, ld_methods = c("r2", "dprime"))
 ```
 
 ### LD between an index variant and a set of other variants
@@ -54,7 +54,7 @@ compute_ld_index(gds, 1, c(2:10), sample_include = sample_include)
 
 Using other methods:
 ```{r}
-compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, methods = c("composite", "dprime"))
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, ld_methods = c("r2", "dprime"))
 ```
 
 ### LD between all pairs in a set of variants
@@ -66,7 +66,7 @@ compute_ld_set(gds, c(1:4), sample_include = sample_include)
 
 Using other methods:
 ```{r}
-compute_ld_set(gds, c(1:4), sample_include = sample_include, methods = c("composite", "dprime"))
+compute_ld_set(gds, c(1:4), sample_include = sample_include, ld_methods = c("r2", "dprime"))
 ```
 
 ## Cleanup
@@ -82,7 +82,7 @@ seqClose(gds)
 ```
 R --no-save --args \
   testdata/1KG_phase3_subset.gds \
-  --methods composite dprime \
+  --ld_methods r2 dprime \
   --variant_include_file_1 testdata/variant_include_pair_1.rds \
   --variant_include_file_2 testdata/variant_include_pair_2.rds \
   --sample_include_file testdata/sample_include.rds \
@@ -95,7 +95,7 @@ R --no-save --args \
 ```
 R --no-save --args \
   testdata/1KG_phase3_subset.gds \
-  --methods composite dprime \
+  --ld_methods r2 dprime \
   --variant_include_file_1 testdata/variant_include_index_1.rds \
   --variant_include_file_2 testdata/variant_include_index_2.rds \
   --sample_include_file testdata/sample_include.rds \
@@ -108,7 +108,7 @@ R --no-save --args \
 ```
 R --no-save --args \
   testdata/1KG_phase3_subset.gds \
-  --methods composite dprime \
+  --ld_methods r2 dprime \
   --variant_include_file_1 testdata/variant_include_set_1.rds \
   --sample_include_file testdata/sample_include.rds \
   --outfile ld_set.rds \

@@ -3,11 +3,14 @@
 #' @param gds A SeqArray GDS file
 #' @param variant_id_1 First variant id in the pair
 #' @param variant_id_2 Second variant id in the pair
-#' @param methods Character vector of methods to use to calculate LD. Can be any of `"composite"`, `"corr"`, `"r"`, `"dprime"`.
+#' @param ld_methods Character vector of methods to use to calculate LD. Can be any of ``"r2"`, `"r"`, `"dprime"`. See details.
 #' @param sample_include A vector of sample.ids to use for LD calculation.
 #'
 #' @details
 #' This function computes the LD between two variants using \code{snpgdsLDMat} using the specified methods.
+#' The `r2` method runs the `SNPRelate` `corr` method and squares the result.
+#' The `r` method runs the `SNPRelate` `corr` method but does not square the result.
+#' The `dprime` method runs the `SNPRelate` `dprime` method.
 #'
 #' @return
 #' A data frame with the following columns:
@@ -26,13 +29,13 @@
 #' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 #'
 #' # Different methods
-#' compute_ld_pair(gds, 1, 2, methods = "composite")
-#' compute_ld_pair(gds, 1, 2, methods = "dprime")
-#' compute_ld_pair(gds, 1, 2, methods = c("composite", "dprime"))
+#' compute_ld_pair(gds, 1, 2)
+#' compute_ld_pair(gds, 1, 2, ld_methods = "dprime")
+#' compute_ld_pair(gds, 1, 2, ld_methods = c("r2", "dprime"))
 #'
 #' # Different sample set
 #' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-#' compute_ld_pair(gds, 1, 2, methods = "composite", sample_include = sample_include)
+#' compute_ld_pair(gds, 1, 2, ld_methods = "r2", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
 #'
@@ -48,10 +51,10 @@
 #' * [compute_ld_pair()] computes LD between a pair of variants
 #' * [compute_ld_set()] computes LD between all pairs of a set of variants
 #' * [compute_ld_index()] computes LD between one variant and a set of other variants
-compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composite", sample_include = NULL) {
+compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2", sample_include = NULL) {
 
     # Checks - to be written.
-    .check_ld_methods(methods)
+    .check_ld_methods(ld_methods)
 
     # Check variant include
     if (length(variant_id_1) != 1) {
@@ -69,11 +72,11 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 
 
     res_list <- list()
-    for (method in methods) {
+    for (ld_method in ld_methods) {
       # Calculate ld between all pairs of variants provided.
-      dat <- .compute_ld_matrix(gds, variant_include, method, sample_include = sample_include) %>%
+      dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include) %>%
           filter(.data$variant.id.1 == variant_id_1, .data$variant.id.2 == variant_id_2)
-      res_list[[method]] <- dat
+      res_list[[ld_method]] <- dat
     }
 
     .combine_ld_results(res_list)
@@ -87,6 +90,9 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #'
 #' @details
 #' This function computes the LD between all pairs in a set of variants using \code{snpgdsLDMat} using the specified methods.
+#' The `r2` method runs the `SNPRelate` `corr` method and squares the result.
+#' The `r` method runs the `SNPRelate` `corr` method but does not square the result.
+#' The `dprime` method runs the `SNPRelate` `dprime` method.
 #'
 #' @return
 #' A data frame with the following columns:
@@ -105,13 +111,13 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 #'
 #' # Different methods
-#' compute_ld_set(gds, c(1, 2, 3), methods = "composite")
-#' compute_ld_set(gds, c(1, 2, 3), methods = "dprime")
-#' compute_ld_set(gds, c(1, 2, 3), methods = c("composite", "dprime"))
+#' compute_ld_set(gds, c(1, 2, 3))
+#' compute_ld_set(gds, c(1, 2, 3), ld_methods = "dprime")
+#' compute_ld_set(gds, c(1, 2, 3), ld_methods = c("r2", "dprime"))
 #'
 #' # Different sample set
 #' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-#' compute_ld_set(gds, c(1, 2, 3), methods = "composite", sample_include = sample_include)
+#' compute_ld_set(gds, c(1, 2, 3), ld_methods = "r2", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
 #'
@@ -127,10 +133,10 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, methods = "composi
 #' * [compute_ld_pair()] computes LD between a pair of variants
 #' * [compute_ld_set()] computes LD between all pairs of a set of variants
 #' * [compute_ld_index()] computes LD between one variant and a set of other variants
-compute_ld_set <- function(gds, variant_include, methods = "composite", sample_include = NULL) {
+compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_include = NULL) {
 
   # Checks - to be written.
-  .check_ld_methods(methods)
+  .check_ld_methods(ld_methods)
 
   # Handle duplicated variants.
   variant_include <- unique(variant_include)
@@ -141,11 +147,11 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
   .check_ld_multiallelic(gds, variant_include)
 
   res_list <- list()
-  for (method in methods) {
+  for (ld_method in ld_methods) {
     # Calculate ld between all pairs of variants provided.
-    dat <- .compute_ld_matrix(gds, variant_include, method, sample_include = sample_include) %>%
+    dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include) %>%
         filter(.data$variant.id.1 < .data$variant.id.2)
-    res_list[[method]] <- dat
+    res_list[[ld_method]] <- dat
   }
 
   .combine_ld_results(res_list)
@@ -160,6 +166,9 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #'
 #' @details
 #' This function computes the LD between `index_variant_id` and the variant ids specified in `other_variant_ids`.
+#' The `r2` method runs the `SNPRelate` `corr` method and squares the result.
+#' The `r` method runs the `SNPRelate` `corr` method but does not square the result.
+#' The `dprime` method runs the `SNPRelate` `dprime` method.
 #'
 #' @return
 #' A data frame with the following columns:
@@ -178,13 +187,13 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #' gds <- SeqArray::seqOpen(system.file("extdata", "1KG_phase3_subset.gds", package="LDcompute"))
 #'
 #' # Different methods
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite")
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "dprime")
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = c("composite", "dprime"))
+#' compute_ld_index(gds, 5, c(2:4, 6:8))
+#' compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = "dprime")
+#' compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = c("r2", "dprime"))
 #'
 #' # Different sample set
 #' sample_include <- SeqArray::seqGetData(gds, "sample.id")[1:500]
-#' compute_ld_index(gds, 5, c(2:4, 6:8), methods = "composite", sample_include = sample_include)
+#' compute_ld_index(gds, 5, c(2:4, 6:8), ld_methods = "r2", sample_include = sample_include)
 #'
 #' SeqArray::seqClose(gds)
 #'
@@ -200,10 +209,10 @@ compute_ld_set <- function(gds, variant_include, methods = "composite", sample_i
 #' * [compute_ld_pair()] computes LD between a pair of variants
 #' * [compute_ld_set()] computes LD between all pairs of a set of variants
 #' * [compute_ld_index()] computes LD between one variant and a set of other variants
-compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods = "composite", sample_include = NULL) {
+compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_methods = "r2", sample_include = NULL) {
 
   # Checks - to be written.
-  .check_ld_methods(methods)
+  .check_ld_methods(ld_methods)
 
   # Check variant include
   if (length(index_variant_id) != 1) {
@@ -222,15 +231,15 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
   .check_ld_multiallelic(gds, variant_include)
 
   res_list <- list()
-  for (method in methods) {
+  for (ld_method in ld_methods) {
     # Calculate ld between all pairs of variants provided.
-    dat <- .compute_ld_matrix(gds, variant_include, method, sample_include = sample_include) %>%
+    dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include) %>%
       filter(
         .data$variant.id.1 == index_variant_id, .data$variant.id.2 %in% other_variant_ids,
         # not with itself.
         .data$variant.id.1 != .data$variant.id.2
       )
-    res_list[[method]] <- dat
+    res_list[[ld_method]] <- dat
   }
 
   .combine_ld_results(res_list)
@@ -238,11 +247,20 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
 
 # Helper functions.
 # Compute LD across a set of variants
-.compute_ld_matrix <- function(gds, variant_include, method, methods = "composite", sample_include = NULL) {
+.compute_ld_matrix <- function(gds, variant_include, ld_method, sample_include = NULL) {
   # Calculate ld between all pairs of variants provided.
   ## This will be memory intensive if calculating LD for many variant.ids.
   ## Could fix by looping over blocks of variants.
-  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = method)
+
+  # Determine correct SNPrelate method.
+  snprel_method <- switch(ld_method,
+    r2 = "corr",
+    r = "corr",
+    dprime = "dprime",
+    stop("method not allowed")
+  )
+
+  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = snprel_method)
   tmp <- ld$LD
 
   # Convert to data frame.
@@ -252,8 +270,12 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
     ld = as.vector(ld$LD)
   )
 
+  if (ld_method == "r2") {
+    dat$ld <- dat$ld^2
+  }
+
   # Set names to reflect ld method.
-  names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", method)
+  names(dat)[names(dat) == "ld"] <- sprintf("ld_%s", ld_method)
 
   dat
 }
@@ -261,7 +283,8 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, methods 
 # Check that a specified LD method is allowed
 .check_ld_methods <- function(methods) {
   ## Check that method is allowed
-  allowed_methods <- c("composite", "dprime", "corr", "r")
+  #allowed_methods <- c("composite", "dprime", "corr", "r")
+  allowed_methods <- c("r2", "r", "dprime")
   if (!all(methods %in% allowed_methods)) {
     msg <- sprintf("method is not in set of allowed methods: %s",
                    paste(allowed_methods, collapse = ", "))
