@@ -5,6 +5,7 @@
 #' @param variant_id_2 Second variant id in the pair
 #' @param ld_methods Character vector of methods to use to calculate LD. Can be any of ``"r2"`, `"r"`, `"dprime"`. See details.
 #' @param sample_include A vector of sample.ids to use for LD calculation.
+#' @param n_threads The number of threads to use for LD calculation.
 #'
 #' @details
 #' This function computes the LD between two variants using \code{snpgdsLDMat} using the specified methods.
@@ -51,7 +52,7 @@
 #' * [compute_ld_pair()] computes LD between a pair of variants
 #' * [compute_ld_set()] computes LD between all pairs of a set of variants
 #' * [compute_ld_index()] computes LD between one variant and a set of other variants
-compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2", sample_include = NULL) {
+compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2", sample_include = NULL, n_threads = 1L) {
 
     # Checks - to be written.
     .check_ld_methods(ld_methods)
@@ -74,7 +75,7 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2",
     res_list <- list()
     for (ld_method in ld_methods) {
       # Calculate ld between all pairs of variants provided.
-      dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include) %>%
+      dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include, n_threads = n_threads) %>%
           filter(.data$variant.id.1 == variant_id_1, .data$variant.id.2 == variant_id_2)
       res_list[[ld_method]] <- dat
     }
@@ -133,7 +134,7 @@ compute_ld_pair <- function (gds, variant_id_1, variant_id_2, ld_methods = "r2",
 #' * [compute_ld_pair()] computes LD between a pair of variants
 #' * [compute_ld_set()] computes LD between all pairs of a set of variants
 #' * [compute_ld_index()] computes LD between one variant and a set of other variants
-compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_include = NULL) {
+compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_include = NULL, n_threads = 1L) {
 
   # Checks - to be written.
   .check_ld_methods(ld_methods)
@@ -149,7 +150,7 @@ compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_inclu
   res_list <- list()
   for (ld_method in ld_methods) {
     # Calculate ld between all pairs of variants provided.
-    dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include) %>%
+    dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include, n_threads = n_threads) %>%
         filter(.data$variant.id.1 < .data$variant.id.2)
     res_list[[ld_method]] <- dat
   }
@@ -209,7 +210,7 @@ compute_ld_set <- function(gds, variant_include, ld_methods = "r2", sample_inclu
 #' * [compute_ld_pair()] computes LD between a pair of variants
 #' * [compute_ld_set()] computes LD between all pairs of a set of variants
 #' * [compute_ld_index()] computes LD between one variant and a set of other variants
-compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_methods = "r2", sample_include = NULL) {
+compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_methods = "r2", sample_include = NULL, n_threads = 1L) {
 
   # Checks - to be written.
   .check_ld_methods(ld_methods)
@@ -233,7 +234,7 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_metho
   res_list <- list()
   for (ld_method in ld_methods) {
     # Calculate ld between all pairs of variants provided.
-    dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include) %>%
+    dat <- .compute_ld_matrix(gds, variant_include, ld_method, sample_include = sample_include, n_threads = n_threads) %>%
       filter(
         .data$variant.id.1 == index_variant_id, .data$variant.id.2 %in% other_variant_ids,
         # not with itself.
@@ -247,7 +248,7 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_metho
 
 # Helper functions.
 # Compute LD across a set of variants
-.compute_ld_matrix <- function(gds, variant_include, ld_method, sample_include = NULL) {
+.compute_ld_matrix <- function(gds, variant_include, ld_method, sample_include = NULL, n_threads = 1L) {
   # Calculate ld between all pairs of variants provided.
   ## This will be memory intensive if calculating LD for many variant.ids.
   ## Could fix by looping over blocks of variants.
@@ -260,7 +261,7 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_metho
     stop("method not allowed")
   )
 
-  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = snprel_method)
+  ld <- snpgdsLDMat(gds, snp.id = variant_include, sample.id = sample_include, slide = -1, verbose = FALSE, method = snprel_method, num.thread = n_threads)
   tmp <- ld$LD
 
   # Convert to data frame.

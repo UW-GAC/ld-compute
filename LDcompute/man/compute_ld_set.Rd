@@ -4,7 +4,13 @@
 \alias{compute_ld_set}
 \title{Compute LD among all pairs of a set of variants}
 \usage{
-compute_ld_set(gds, variant_include, ld_methods = "r2", sample_include = NULL)
+compute_ld_set(
+  gds,
+  variant_include,
+  ld_methods = "r2",
+  sample_include = NULL,
+  n_threads = 1L
+)
 }
 \arguments{
 \item{gds}{A SeqArray GDS file}
@@ -14,6 +20,8 @@ compute_ld_set(gds, variant_include, ld_methods = "r2", sample_include = NULL)
 \item{ld_methods}{Character vector of methods to use to calculate LD. Can be any of ``"r2"\verb{, }"r"`, `"dprime"`. See details.}
 
 \item{sample_include}{A vector of sample.ids to use for LD calculation.}
+
+\item{n_threads}{The number of threads to use for LD calculation.}
 }
 \value{
 A data frame with the following columns:

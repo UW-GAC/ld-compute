@@ -12,6 +12,7 @@ argp <- arg_parser("Calculate LD") %>%
   add_argument("--variant_include_file_1", help = "path to a file containing variant ids") %>%
   add_argument("--variant_include_file_2", help = "path to a file containing variant ids (optional)") %>%
   add_argument("--sample_include_file", help = "path to a file containing the set of sample ids to include") %>%
+  add_argument("--n_threads", help="number of threads for LD computation", default=1) %>%
   add_argument("--outfile", help = "output file name")
 
 argv <- parse_args(argp)
@@ -51,11 +52,11 @@ if (!is.na(argv$sample_include_file)) {
 gds <- seqOpen(argv$gds)
 
 if (ld_type == "pair") {
-  ld <- compute_ld_pair(gds, variant_include_1, variant_include_2, sample_include = sample_include, ld_methods = argv$ld_methods)
+  ld <- compute_ld_pair(gds, variant_include_1, variant_include_2, sample_include = sample_include, ld_methods = argv$ld_methods, n_threads = argv$n_threads)
 } else if (ld_type == "index") {
-  ld <- compute_ld_index(gds, variant_include_1, variant_include_2, sample_include = sample_include, ld_methods = argv$ld_methods)
+  ld <- compute_ld_index(gds, variant_include_1, variant_include_2, sample_include = sample_include, ld_methods = argv$ld_methods, n_threads = argv$n_threads)
 } else if (ld_type == "set") {
-  ld <- compute_ld_set(gds, variant_include_1, sample_include = sample_include, ld_methods = argv$ld_methods)
+  ld <- compute_ld_set(gds, variant_include_1, sample_include = sample_include, ld_methods = argv$ld_methods, n_threads = argv$n_threads)
 }
 
 # Preview.

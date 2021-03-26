@@ -9,7 +9,8 @@ compute_ld_index(
   index_variant_id,
   other_variant_ids,
   ld_methods = "r2",
-  sample_include = NULL
+  sample_include = NULL,
+  n_threads = 1L
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ compute_ld_index(
 \item{ld_methods}{Character vector of methods to use to calculate LD. Can be any of ``"r2"\verb{, }"r"`, `"dprime"`. See details.}
 
 \item{sample_include}{A vector of sample.ids to use for LD calculation.}
+
+\item{n_threads}{The number of threads to use for LD calculation.}
 }
 \value{
 A data frame with the following columns:
