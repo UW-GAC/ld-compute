@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - use-github-actions
   pull_request:
     branches:
       - main
