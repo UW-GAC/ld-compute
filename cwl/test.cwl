@@ -15,12 +15,8 @@ outputs: []
 stdout: job.out.log
 
 baseCommand:
-- wget
-- https://raw.githubusercontent.com/UW-GAC/ld-compute/sbg-cwl/test_sbg.R
-- '&&'
-- R
-- -q
-- --vanilla
+- wget https://raw.githubusercontent.com/UW-GAC/ld-compute/sbg-cwl/test_sbg.R '&&'
+- R -q --vanilla
 arguments:
 - prefix: <
   position: 100
