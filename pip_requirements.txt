@@ -1,0 +1,10 @@
+certifi==2020.12.5
+chardet==4.0.0
+cwlformat==2021.1.5
+idna==2.10
+requests==2.25.1
+ruamel.yaml==0.16.12
+ruamel.yaml.clib==0.2.2
+sbpack==2020.10.5
+sevenbridges-python==2.3.0
+urllib3==1.26.4
