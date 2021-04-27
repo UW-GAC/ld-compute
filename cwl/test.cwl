@@ -1,8 +1,6 @@
 cwlVersion: v1.1
 class: CommandLineTool
 label: test
-$namespaces:
-  sbg: https://sevenbridges.com
 
 requirements:
 - class: ShellCommandRequirement
