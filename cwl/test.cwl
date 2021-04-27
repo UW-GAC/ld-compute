@@ -57,11 +57,11 @@ inputs:
 - id: outfile
   type: string
   inputBinding:
-    prefix: --outfile
+    prefix: --out_prefix
     position: 4
     shellQuote: false
-  label: Output file.
-  doc: Output file. Must end in .rds.
+  label: Output file prefix.
+  doc: Output file prefix. Will be appended to "_ld.rds".
 
 outputs:
 - id: ld
@@ -73,7 +73,7 @@ stdout: job.out.log
 baseCommand:
 - R -q --vanilla < install_package.R
 - '&&'
-- wget https://raw.githubusercontent.com/UW-GAC/ld-compute/sbg-cwl-test/compute_ld.R
+- wget https://raw.githubusercontent.com/UW-GAC/ld-compute/main/compute_ld.R
 - '&&'
 - R -q --vanilla --args
 arguments:
