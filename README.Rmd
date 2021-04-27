@@ -17,10 +17,10 @@ library(SeqArray)
 
 Load the `LDcompute` package.
 
-```{r, echo = FALSE, include = TRUE}
+```
 library(LDcompute)
 ```
-```{r, echo = TRUE, include = FALSE}
+```{r, echo = FALSE, include = TRUE}
 devtools::load_all("LDcompute")
 ```
 
@@ -86,9 +86,11 @@ R --no-save --args \
   --variant_include_file_1 testdata/variant_include_pair_1.rds \
   --variant_include_file_2 testdata/variant_include_pair_2.rds \
   --sample_include_file testdata/sample_include.rds \
-  --outfile ld_pair.rds \
+  --out_prefix pair \
   < compute_ld.R
 ```
+
+This creates a file called `pair_ld.rds`.
 
 ### LD between an index variant and a set of other variants
 
@@ -99,9 +101,11 @@ R --no-save --args \
   --variant_include_file_1 testdata/variant_include_index_1.rds \
   --variant_include_file_2 testdata/variant_include_index_2.rds \
   --sample_include_file testdata/sample_include.rds \
-  --outfile ld_index.rds \
+  --out_prefix index \
   < compute_ld.R
 ```
+
+This creates a file called `index_ld.rds`.
 
 ### LD between all pairs in a set of variants
 
@@ -111,6 +115,8 @@ R --no-save --args \
   --ld_methods r2 dprime \
   --variant_include_file_1 testdata/variant_include_set_1.rds \
   --sample_include_file testdata/sample_include.rds \
-  --outfile ld_set.rds \
+  --out_prefix set \
   < compute_ld.R
 ```
+
+This creates a file called `set_ld.rds`.

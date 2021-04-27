@@ -13,7 +13,7 @@ argp <- arg_parser("Calculate LD") %>%
   add_argument("--variant_include_file_2", help = "path to a file containing variant ids (optional)") %>%
   add_argument("--sample_include_file", help = "path to a file containing the set of sample ids to include") %>%
   add_argument("--n_threads", help="number of threads for LD computation", default=1) %>%
-  add_argument("--outfile", help = "output file name")
+  add_argument("--out_prefix", help = "output file prefix")
 
 argv <- parse_args(argp)
 print(argv)
@@ -64,4 +64,10 @@ if (ld_type == "pair") {
 ld
 
 # Save
-saveRDS(ld, file = argv$outfile)
+if (!is.na(argv$out_prefix)) {
+  outfile <- paste0(argv$out_prefix, "_ld.rds")
+} else {
+  outfile <- "ld.rds"
+}
+outfile
+saveRDS(ld, file = outfile)
