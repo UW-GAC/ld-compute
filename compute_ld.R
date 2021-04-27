@@ -64,5 +64,10 @@ if (ld_type == "pair") {
 ld
 
 # Save
-outfile <- paste0(argv$outprefix, "ld.rds")
+if (!is.na(argv$out_prefix)) {
+  outfile <- paste0(argv$out_prefix, "_ld.rds")
+} else {
+  outfile <- "ld.rds"
+}
+outfile
 saveRDS(ld, file = outfile)
