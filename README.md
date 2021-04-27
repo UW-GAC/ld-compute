@@ -10,21 +10,33 @@ includes an example wrapper script (`compute_ld.R`) and test data
 
 Load other packages.
 
-    library(SeqArray)
+``` r
+library(SeqArray)
+```
 
 Load the `LDcompute` package.
 
+    library(LDcompute)
+
+    ## ℹ Loading LDcompute
+
 Open the gds file:
 
-    gds <- seqOpen("testdata/1KG_phase3_subset.gds")
+``` r
+gds <- seqOpen("testdata/1KG_phase3_subset.gds")
+```
 
 Choose the sample set:
 
-    sample_include <- seqGetData(gds, "sample.id")[1:500]
+``` r
+sample_include <- seqGetData(gds, "sample.id")[1:500]
+```
 
 ### LD between a pair of variants
 
-    compute_ld_pair(gds, 1, 2, sample_include = sample_include)
+``` r
+compute_ld_pair(gds, 1, 2, sample_include = sample_include)
+```
 
     ## # A tibble: 1 x 3
     ##   variant.id.1 variant.id.2    ld_r2
@@ -33,7 +45,9 @@ Choose the sample set:
 
 Using other methods:
 
-    compute_ld_pair(gds, 1, 2, sample_include = sample_include, ld_methods = c("r2", "dprime"))
+``` r
+compute_ld_pair(gds, 1, 2, sample_include = sample_include, ld_methods = c("r2", "dprime"))
+```
 
     ## # A tibble: 1 x 4
     ##   variant.id.1 variant.id.2    ld_r2 ld_dprime
@@ -42,7 +56,9 @@ Using other methods:
 
 ### LD between an index variant and a set of other variants
 
-    compute_ld_index(gds, 1, c(2:10), sample_include = sample_include)
+``` r
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include)
+```
 
     ## # A tibble: 9 x 3
     ##   variant.id.1 variant.id.2       ld_r2
@@ -59,7 +75,9 @@ Using other methods:
 
 Using other methods:
 
-    compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, ld_methods = c("r2", "dprime"))
+``` r
+compute_ld_index(gds, 1, c(2:10), sample_include = sample_include, ld_methods = c("r2", "dprime"))
+```
 
     ## # A tibble: 9 x 4
     ##   variant.id.1 variant.id.2       ld_r2 ld_dprime
@@ -76,7 +94,9 @@ Using other methods:
 
 ### LD between all pairs in a set of variants
 
-    compute_ld_set(gds, c(1:4), sample_include = sample_include)
+``` r
+compute_ld_set(gds, c(1:4), sample_include = sample_include)
+```
 
     ## # A tibble: 6 x 3
     ##   variant.id.1 variant.id.2       ld_r2
@@ -90,7 +110,9 @@ Using other methods:
 
 Using other methods:
 
-    compute_ld_set(gds, c(1:4), sample_include = sample_include, ld_methods = c("r2", "dprime"))
+``` r
+compute_ld_set(gds, c(1:4), sample_include = sample_include, ld_methods = c("r2", "dprime"))
+```
 
     ## # A tibble: 6 x 4
     ##   variant.id.1 variant.id.2       ld_r2 ld_dprime
@@ -104,7 +126,9 @@ Using other methods:
 
 ## Cleanup
 
-    seqClose(gds)
+``` r
+seqClose(gds)
+```
 
 ## Running compute\_ld.R with test data
 
@@ -116,8 +140,10 @@ Using other methods:
       --variant_include_file_1 testdata/variant_include_pair_1.rds \
       --variant_include_file_2 testdata/variant_include_pair_2.rds \
       --sample_include_file testdata/sample_include.rds \
-      --outfile ld_pair.rds \
+      --out_prefix pair \
       < compute_ld.R
+
+This creates a file called `pair_ld.rds`.
 
 ### LD between an index variant and a set of other variants
 
@@ -127,8 +153,10 @@ Using other methods:
       --variant_include_file_1 testdata/variant_include_index_1.rds \
       --variant_include_file_2 testdata/variant_include_index_2.rds \
       --sample_include_file testdata/sample_include.rds \
-      --outfile ld_index.rds \
+      --out_prefix index \
       < compute_ld.R
+
+This creates a file called `index_ld.rds`.
 
 ### LD between all pairs in a set of variants
 
@@ -137,5 +165,7 @@ Using other methods:
       --ld_methods r2 dprime \
       --variant_include_file_1 testdata/variant_include_set_1.rds \
       --sample_include_file testdata/sample_include.rds \
-      --outfile ld_set.rds \
+      --out_prefix set \
       < compute_ld.R
+
+This creates a file called `set_ld.rds`.
