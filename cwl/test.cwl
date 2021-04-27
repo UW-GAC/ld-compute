@@ -25,7 +25,13 @@ inputs:
   label: GDS file
   doc: GDS file
 - id: ld_methods
-  type: string
+  type:
+    name: ld_methods
+    type: enum
+    symbols:
+    - r2
+    - dprime
+    - r
   inputBinding:
     prefix: --ld_methods
     position: 1
