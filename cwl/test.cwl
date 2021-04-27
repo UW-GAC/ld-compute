@@ -67,7 +67,7 @@ stdout: job.out.log
 baseCommand:
 - R -q --vanilla < install_package.R
 - '&&'
-- wget https://raw.githubusercontent.com/UW-GAC/ld-compute/sbg-cwl/compute_ld.R
+- wget https://raw.githubusercontent.com/UW-GAC/ld-compute/sbg-cwl-test/compute_ld.R
 - '&&'
 - R -q --vanilla --args
 arguments:
