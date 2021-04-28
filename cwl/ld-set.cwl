@@ -54,7 +54,7 @@ inputs:
     shellQuote: false
   label: sample include file
   doc: File containing the sample ids on which to calculate LD.
-- id: outfile
+- id: output_prefix
   type: string
   inputBinding:
     prefix: --out_prefix

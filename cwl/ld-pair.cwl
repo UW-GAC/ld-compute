@@ -54,7 +54,7 @@ inputs:
     shellQuote: false
   label: Variant id file 2
   doc: File containing second variant id in the pair.
-- id: outfile
+- id: output_prefix
   type: string
   inputBinding:
     prefix: --out_prefix

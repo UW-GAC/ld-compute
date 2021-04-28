@@ -54,7 +54,7 @@ inputs:
     shellQuote: false
   label: Other variant id file
   doc: File containing variant ids of the other variants to calculate LD with index variant.
-- id: outfile
+- id: output_prefix
   type: string
   inputBinding:
     prefix: --out_prefix
