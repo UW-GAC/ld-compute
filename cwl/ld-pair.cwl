@@ -26,12 +26,14 @@ inputs:
   doc: GDS file
 - id: ld_methods
   type:
-    name: ld_methods
-    type: enum
-    symbols:
-    - r2
-    - dprime
-    - r
+    type: array
+    items:
+      type: enum
+      name: ld_methods
+      symbols:
+        - r2
+        - r
+        - dprime
   inputBinding:
     prefix: --ld_methods
     position: 1
