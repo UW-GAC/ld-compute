@@ -47,7 +47,7 @@ inputs:
   label: Index variant file
   doc: File containing variant id of the index variant.
 - id: variant_include_file_2
-  type: File?
+  type: File
   inputBinding:
     prefix: --variant_include_file_2
     position: 3
