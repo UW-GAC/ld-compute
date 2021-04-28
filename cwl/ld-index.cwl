@@ -62,6 +62,14 @@ inputs:
     shellQuote: false
   label: Output file prefix.
   doc: Output file prefix. Will be appended to "_ld.rds".
+- id: sample_include_file
+  type: File?
+  inputBinding:
+    prefix: --sample_include_file
+    position: 5
+    shellQuote: false
+  label: sample include file
+  doc: File containing the sample ids on which to calculate LD.
 
 outputs:
 - id: ld
