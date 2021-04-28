@@ -155,6 +155,13 @@ test_that("multiple methods are allowed", {
   expect_error(compute_ld_set(gds, var1, var2, ld_methods = c("r", "foo")), "allowed methods")
 })
 
+test_that("fails with duplicated method", {
+  # Use a different method to calculate LD.
+  gds <- local_gds()
+  expect_error(compute_ld_pair(gds, c(1, 2, 3), ld_methods = c("r2", "r2")),
+               "duplicated ld_methods provided")
+})
+
 test_that("different chromosomes", {
   gds <- local_gds()
   variant_ids <- seqGetData(gds, "variant.id")

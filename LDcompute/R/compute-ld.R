@@ -291,6 +291,10 @@ compute_ld_index <- function (gds, index_variant_id, other_variant_ids, ld_metho
                    paste(allowed_methods, collapse = ", "))
     stop(msg)
   }
+
+  if (any(duplicated(methods))) {
+    stop("duplicated ld_methods provided. specify each method only once.")
+  }
 }
 
 # Handle multiallelic variants
