@@ -1,7 +1,8 @@
 cwlVersion: v1.1
 class: CommandLineTool
 label: ld-index
-doc: Calculate LD between an index variant and a set of other variants.
+doc: |-
+  Calculate LD between an index variant and a set of other variants.
 
 requirements:
 - class: ShellCommandRequirement

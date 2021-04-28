@@ -1,7 +1,8 @@
 cwlVersion: v1.1
 class: CommandLineTool
 label: ld-set
-doc: Calculate LD between all pairs in a set of variants.
+doc: |-
+  Calculate LD between all pairs in a set of variants.
 
 requirements:
 - class: ShellCommandRequirement

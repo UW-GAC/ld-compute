@@ -1,7 +1,8 @@
 cwlVersion: v1.1
 class: CommandLineTool
 label: ld-pair
-doc: Calculate LD between a pair of variants
+doc: |-
+  Calculate LD between a pair of variants.
 
 requirements:
 - class: ShellCommandRequirement
