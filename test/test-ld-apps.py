@@ -46,6 +46,7 @@ class Platform(unittest.TestCase):
     """
 
     project_name = 'amstilp/ld-compute-devel'
+    task = None
 
     @classmethod
     def setUpClass(cls):
@@ -120,6 +121,17 @@ class Platform(unittest.TestCase):
             cls.log.info(f"#task_id {cls.task.id}")
         except:
             cls.log.info(f" I was unable to run {cls.APP} task")
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Clean up after platform tests.
+        """
+        if cls.task:
+            for key in cls.task.outputs.keys():
+                output_file = cls.task.outputs[key]
+                cls.log.info(f" Delete output file {output_file}")
+                output_file.delete()
 
 
 class PlatformLdIndex(Platform):
