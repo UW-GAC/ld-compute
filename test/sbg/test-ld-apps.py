@@ -94,8 +94,9 @@ class Platform(unittest.TestCase):
         cls.project = cls.session.projects.get(id=cls.project_name)
 
         # SET INPUTS'
-        # Identify testdata directory.
-        testdir = cls.session.files.query(project=cls.project, names=['testdata'])[0]
+        # Obtain testdata directory.
+        testdir = cls.session.files.get(id='607887f4a7302d041ec4c9fc')
+        print(testdir)
         cls.inputs = {}
         for key in cls.input_filenames:
             cls.inputs[key] = cls.session.files.query(
