@@ -70,7 +70,7 @@ inputs:
     prefix: --sample_include_file
     position: 5
     shellQuote: false
-  label: sample include file
+  label: Sample include file
   doc: File containing the sample ids on which to calculate LD.
 
 outputs:
