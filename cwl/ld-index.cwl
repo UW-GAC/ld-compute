@@ -40,7 +40,7 @@ inputs:
     shellQuote: false
   label: LD calculation method
   doc: Methods to use for calculating LD. Can be one of r2, dprime, r.
-- id: variant_include_file_1
+- id: index_variant_include_file
   type: File
   inputBinding:
     prefix: --variant_include_file_1
@@ -48,7 +48,7 @@ inputs:
     shellQuote: false
   label: Index variant file
   doc: File containing variant id of the index variant.
-- id: variant_include_file_2
+- id: other_variant_include_file
   type: File
   inputBinding:
     prefix: --variant_include_file_2

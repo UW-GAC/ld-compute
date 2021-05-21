@@ -40,21 +40,21 @@ inputs:
     shellQuote: false
   label: LD calculation method
   doc: Methods to use for calculating LD. Can be one of r2, dprime, r.
-- id: variant_include_file_1
+- id: first_variant_include_file
   type: File
   inputBinding:
     prefix: --variant_include_file_1
     position: 2
     shellQuote: false
-  label: Variant id file 1
+  label: First variant id file
   doc: File containing first variant id in the pair.
-- id: variant_include_file_2
+- id: second_variant_include_file
   type: File?
   inputBinding:
     prefix: --variant_include_file_2
     position: 3
     shellQuote: false
-  label: Variant id file 2
+  label: Second variant id file
   doc: File containing second variant id in the pair.
 - id: output_prefix
   type: string

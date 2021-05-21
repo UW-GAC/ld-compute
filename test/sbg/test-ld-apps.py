@@ -148,8 +148,8 @@ class PlatformLdIndex(Platform):
     log_filename = 'ld-index'
     input_filenames = {
         'gds_file': ['1KG_phase3_subset.gds'],
-        'variant_include_file_1': ['variant_include_index_1.rds'],
-        'variant_include_file_2': ['variant_include_index_2.rds'],
+        'index_variant_include_file': ['variant_include_index_1.rds'],
+        'other_variant_include_file': ['variant_include_index_2.rds'],
         'sample_include_file': ['sample_include.rds'],
     }
     other_input = {
@@ -203,8 +203,8 @@ class PlatformLdPair(Platform):
     log_filename = 'ld-pair'
     input_filenames = {
         'gds_file': ['1KG_phase3_subset.gds'],
-        'variant_include_file_1': ['variant_include_pair_1.rds'],
-        'variant_include_file_2': ['variant_include_pair_2.rds'],
+        'first_variant_include_file': ['variant_include_pair_1.rds'],
+        'second_variant_include_file': ['variant_include_pair_2.rds'],
         'sample_include_file': ['sample_include.rds'],
     }
     other_input = {
