@@ -4,12 +4,12 @@ label: ld-set
 doc: |-
   Linkage disequilibrium (LD) is a measure of the non-random association of alleles at different loci in a given sample set. It is often used in genetic data analysis to identify a set of independent variants, to identify independent signals in association test results, or to examine the correlation between two variants in a dataset.
 
-  This tool calculates the LD between all pairs in a user-specified set of variants stored in a GDS file using the `snpgdsLDMat` function in the [SNPRelate R package](https://bioconductor.org/packages/release/bioc/html/SNPRelate.html) and a wrapper [LDcompute R package](https://github.com/UW-GAC/ld-compute). Users can optionally specify the set of samples to use in the calculation. Genotypes must first be converted to SeqArray GDS format to use this tool.
+  This tool calculates the LD between all pairs in a user-specified set of variants stored in a GDS file using the `snpgdsLDMat` function in the [SNPRelate R package](https://bioconductor.org/packages/release/bioc/html/SNPRelate.html) and a wrapper [LDcompute R package](https://github.com/UW-GAC/ld-compute). Users can optionally specify the set of samples to use in the calculation. Genotypes must first be converted to [SeqArray](https://bioconductor.org/packages/release/bioc/html/SeqArray.html) GDS format to use this tool.
 
   The user can choose three different methods to calculate LD:
   * `r`: the pearson correlation coefficient between the reference allele dosages for the pair of variants.
   * `r2`: the squared pearson correlation coefficient between the reference allele dosages for the pair of variants.
-  * `dprime`: the normalized coefficient of linkage disequilibrium, which measures the difference of the frequency at which a pair of alleles at the two variants are observed together from the expected frequency if the two variants were independent
+  * `dprime`: the normalized coefficient of linkage disequilibrium, which measures the difference of the frequency at which a pair of alleles at the two variants are observed together from the expected frequency if the two variants were independent.
 
   Multiple LD calculation methods can be selected in one run.
 
