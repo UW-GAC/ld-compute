@@ -91,6 +91,17 @@ inputs:
     shellQuote: false
   label: Sample include file
   doc: File containing the sample ids on which to calculate LD.
+- id: cpu
+  label: cpu
+  doc: Number of CPUs to use.
+  type: int?
+  default: 4
+  inputBinding:
+    prefix: --n_threads
+    position: 20
+    shellQuote: false
+  sbg:category: Input Options
+  sbg:toolDefaultValue: '4'
 
 outputs:
 - id: ld
