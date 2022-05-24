@@ -47,3 +47,6 @@ docs/
 po/*~
 
 *.html
+
+### My stuff
+venv
