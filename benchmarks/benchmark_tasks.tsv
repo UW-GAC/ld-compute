@@ -1,0 +1,21 @@
+	task_id	n_samples	n_variants	interruptible	instance_type	methods	cpu	task_name
+0	958ea544-5fc1-4239-85ea-cb2ff22f5e7f	10k	1000	True	c4.2xlarge	['r2']	8	api-benchmark - 10k - 1000 - c4.2xlarge - 8
+1	a29ace47-f741-460e-946b-ebc4308cf3e3	10k	2000	True	c4.2xlarge	['r2']	8	api-benchmark - 10k - 2000 - c4.2xlarge - 8
+2	930f2aee-4770-4dd1-adf4-0cd357769532	10k	5000	True	c4.2xlarge	['r2']	8	api-benchmark - 10k - 5000 - c4.2xlarge - 8
+3	766383ce-d231-46cc-bdfa-3307f92e218d	10k	10000	True	c4.2xlarge	['r2']	8	api-benchmark - 10k - 10000 - c4.2xlarge - 8
+4	83a4467d-8e6c-43b7-8aa9-2331cac0be53	10k	20000	True	c4.2xlarge	['r2']	8	api-benchmark - 10k - 20000 - c4.2xlarge - 8
+5	e50c32f7-ac9b-4881-a2c0-18177ee258c4	36k	1000	True	c4.2xlarge	['r2']	8	api-benchmark - 36k - 1000 - c4.2xlarge - 8
+6	1577fb91-8c8f-48e6-b8e0-9b3da42548d6	36k	2000	True	c4.2xlarge	['r2']	8	api-benchmark - 36k - 2000 - c4.2xlarge - 8
+7	a202bba5-09d2-4817-a21d-6182ff581564	36k	5000	True	c4.2xlarge	['r2']	8	api-benchmark - 36k - 5000 - c4.2xlarge - 8
+8	cbd486e9-2a7f-491b-82d0-e2f16aa5be2e	36k	10000	True	c4.2xlarge	['r2']	8	api-benchmark - 36k - 10000 - c4.2xlarge - 8
+9	1c827c04-58c2-442c-b3f1-1f96fa66ccff	36k	20000	True	c4.2xlarge	['r2']	8	api-benchmark - 36k - 20000 - c4.2xlarge - 8
+10	fcd4bf80-2b42-4061-a639-b90b6e6f40d4	50k	1000	True	c4.2xlarge	['r2']	8	api-benchmark - 50k - 1000 - c4.2xlarge - 8
+11	4208d39e-96cb-46e0-a447-52bbb90e3986	50k	2000	True	c4.2xlarge	['r2']	8	api-benchmark - 50k - 2000 - c4.2xlarge - 8
+12	74ead72c-03ac-4604-9447-6b8c8d919e86	50k	5000	True	c4.2xlarge	['r2']	8	api-benchmark - 50k - 5000 - c4.2xlarge - 8
+13	a21b5b71-2c09-44c4-8517-68a3674b616d	50k	10000	True	c4.2xlarge	['r2']	8	api-benchmark - 50k - 10000 - c4.2xlarge - 8
+14	ba64419e-8e5c-4c3a-a1fe-533d5aa0d934	50k	20000	True	c4.2xlarge	['r2']	8	api-benchmark - 50k - 20000 - c4.2xlarge - 8
+15	5af49e98-98d3-4a43-8e16-7fd4cb7dcfc8	50k	20000	True	c4.8xlarge	['r2']	8	api-benchmark - 50k - 20000 - c4.8xlarge - 8
+16	de029f0c-045c-4c28-b762-cb1844f8aeae	50k	20000	True	c4.8xlarge	['r2']	36	api-benchmark - 50k - 20000 - c4.8xlarge - 36
+17	a0152eec-78e3-4ac5-a648-0724e5ceb18c	50k	20000	False	c4.8xlarge	['r2']	36	api-benchmark - 50k - 20000 - c4.8xlarge - 36
+18	6ab6bd6d-4228-4c47-972e-744789239ca6	50k	20000	True	c4.8xlarge	"['r2', 'dprime']"	36	api-benchmark - 50k - 20000 - c4.8xlarge - 36
+19	33087514-97cd-4b16-98f8-689503e17e38	36k	20000	True	c4.8xlarge	['r2']	36	api-benchmark - 36k - 20000 - c4.8xlarge - 8
